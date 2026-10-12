@@ -12,14 +12,15 @@
   body { background: var(--bg); color: #eee; font-family: Segoe UI, Arial, sans-serif; margin: 0; padding: 16px; }
   h1 { font-size: 20px; margin: 0 0 4px; }
   .sub { color: #9aa4b2; font-size: 12px; margin-bottom: 12px; }
-  .toolbar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; align-items: center; }
-  .toolbar > button { width: 100%; min-width: 0; min-height: 34px; text-align: center; overflow-wrap: anywhere; }
+  .toolbar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 14px; align-items: stretch; }
+  .toolbar > button { width: 100%; min-width: 0; min-height: 38px; text-align: center; overflow-wrap: anywhere; padding: 8px 10px; }
   .toolbar input[type=text] { max-width: 100%; }
-  .toolbar > input[type=text], .toolbar > .progress { grid-column: 1 / -1; }
-  .toolbar label.hide { grid-column: 1 / -1; }
+  .toolbar > input[type=text] { grid-column: span 3; width: 100%; min-height: 38px; }
+  .toolbar > .progress { grid-column: 1 / -1; }
+  .toolbar label.hide { grid-column: span 1; justify-content: center; padding: 8px; background: #1e242e; border: 1px solid #333c49; border-radius: 6px; min-width: 0; }
   .toolbar select { min-width: 0; width: 100%; background: #0f1319; border: 1px solid #333c49; color: #eee; padding: 7px 8px; border-radius: 6px; }
-  .hunt-controls { grid-column: span 2; display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 6px; min-width: 0; }
-  .hunt-controls select, .hunt-controls button { width: 100%; min-width: 0; height: 100%; }
+  .hunt-controls { grid-column: span 2; display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 8px; min-width: 0; }
+  .hunt-controls select, .hunt-controls button { width: 100%; min-width: 0; min-height: 38px; }
   .hunt-controls button { padding-left: 6px; padding-right: 6px; }
   .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
   .stat { background: var(--card); border: 1px solid #333c49; border-radius: 8px; padding: 10px; min-width: 0; }
@@ -30,7 +31,7 @@
   .milestone-track { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; margin-top: 10px; }
   .milestone-step { text-align: center; border-radius: 5px; padding: 7px 2px; font-size: 10px; color: #9aa4b2; background: #0f1319; border: 1px solid #333c49; }
   .milestone-step.done { color: #7ed6a5; border-color: #7ed6a5; background: #193027; }
-  @media (max-width: 520px) { body { padding: 10px; } .toolbar { gap: 6px; } .toolbar > button { padding: 7px 4px; font-size: 11px; } .hunt-controls { grid-column: 1 / -1; } .hunt-controls button { font-size: 12px; } .stats { gap: 5px; } .stat { padding: 7px; } .stat-value { font-size: 15px; } }
+  @media (max-width: 520px) { body { padding: 10px; } .toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; } .toolbar > input[type=text] { grid-column: 1 / -1; } .toolbar label.hide { grid-column: 1 / -1; justify-content: flex-start; } .toolbar > button { padding: 8px 5px; font-size: 11px; } .hunt-controls { grid-column: 1 / -1; } .hunt-controls button { font-size: 12px; } .stats { gap: 5px; } .stat { padding: 7px; } .stat-value { font-size: 15px; } }
   .toolbar input[type=text] { background: #0f1319; border: 1px solid #333c49; color: #eee; padding: 6px 10px; border-radius: 6px; width: 220px; }
   button { background: #2b3542; color: #eee; border: 1px solid #3d4a5c; border-radius: 6px; padding: 6px 12px; cursor: pointer; }
   button:hover { background: #374354; }
