@@ -71,17 +71,9 @@
   .toolbar button { cursor: pointer; }
   .toolbar button:hover { background: #303d4d; }
   .more-tools { position: relative; margin-top: 9px; }
-  .more-tools summary {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    color: #9daaba;
-    font-size: 12px;
-    cursor: pointer;
-    user-select: none;
-    padding: 5px 2px;
-  }
-  .more-tools summary:hover { color: #eee; }
+  .more-tools summary { display: none; }
+  .more-tools:not([open]) > .tool-menu { display: flex; }
+  .more-tools > .tool-menu { padding-top: 0; }
   .tool-menu {
     display: flex;
     flex-wrap: wrap;
@@ -239,7 +231,7 @@
       <button id="huntBtn">🎯 Random missing</button>
     </div>
   </div>
-  <details class="more-tools">
+  <details class="more-tools" open>
     <summary>More tools</summary>
     <div class="tool-menu">
       <button id="manageItems">Manage items</button>
