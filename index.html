@@ -121,6 +121,7 @@
   <button id="import">Import progress</button>
   <button id="historyBtn">Collection history</button>
   <button id="huntBtn">🎯 Random missing</button>
+  <button id="undoBtn">↶ Undo last change</button>
   <button id="copyMissing">Copy missing</button>
   <button id="copyGot">Copy obtained</button>
   <input type="file" id="importFile" accept="application/json" style="display:none">
@@ -309,6 +310,23 @@ async function loadCatalogue(){
 loadCatalogue().catch(err => {
   document.getElementById("totalProg").textContent = "Could not load items.json: " + err.message;
   console.error(err);
+});
+document.getElementById("undoBtn").addEventListener("click", () => {
+  if (!Array.isArray(state.history) || !state.history.length) {
+    alert("Nothing to undo yet — collection changes will appear here.");
+    return;
+  }
+  const entry = state.history.shift();
+  if (!entry || typeof entry.id !== "string" || typeof entry.obtained !== "boolean") {
+    save();
+    alert("That history entry cannot be undone.");
+    return;
+  }
+  state.got[entry.id] = !entry.obtained;
+  const cell = document.querySelector('.cell[data-id="' + CSS.escape(entry.id) + '"]');
+  if (cell) cell.classList.toggle("got", !!state.got[entry.id]);
+  save();
+  update();
 });
 document.getElementById("huntBtn").addEventListener("click", () => {
   const missing = ALL.filter(([id]) => !state.got[id]);
