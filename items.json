@@ -476,6 +476,12 @@
       "image": "cell-e31.png"
     },
     {
+      "id": "e32",
+      "name": "Hoprock Cube Rifle",
+      "category": "exotic",
+      "image": "cell-e32.png"
+    },
+    {
       "id": "d01",
       "name": "Explosive Dev Chest",
       "category": "dev",
