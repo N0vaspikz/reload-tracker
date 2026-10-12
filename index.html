@@ -13,85 +13,93 @@
   h1 { font-size: 20px; margin: 0 0 4px; }
   .sub { color: #9aa4b2; font-size: 12px; margin-bottom: 12px; }
   .toolbar {
+    margin: 0 0 14px;
+    padding: 12px;
+    background: #1a202a;
+    border: 1px solid #303946;
+    border-radius: 10px;
+  }
+  .toolbar-main {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 9px;
-    margin: 0 0 16px;
-    padding: 14px;
+    grid-template-columns: minmax(180px, 1fr) auto minmax(280px, .9fr);
+    gap: 8px;
     align-items: center;
-    background: linear-gradient(145deg, #1b222d, #171d26);
-    border: 1px solid #303b4a;
-    border-radius: 14px;
-    box-shadow: 0 8px 24px #00000020;
   }
-  .toolbar > * { min-width: 0; }
-  .toolbar > input[type=text] {
-    grid-column: span 2;
+  .toolbar-main > * { min-width: 0; }
+  .toolbar input[type=text] {
     width: 100%;
-    max-width: none;
-    min-height: 40px;
-    padding: 9px 12px;
+    min-width: 0;
+    min-height: 38px;
+    padding: 8px 11px;
     background: #10151d;
-    border: 1px solid #3a4657;
-    border-radius: 9px;
-    color: #f4f6fa;
-    outline: none;
+    border: 1px solid #333e4d;
+    border-radius: 7px;
+    color: #eee;
   }
-  .toolbar > input[type=text]:focus {
-    border-color: #6e9dd8;
-    box-shadow: 0 0 0 3px #6e9dd822;
-  }
+  .toolbar input[type=text]:focus { outline: 1px solid #637f9f; border-color: #637f9f; }
   .toolbar label.hide {
-    grid-column: span 2;
-    justify-content: flex-start;
-    gap: 9px;
-    min-height: 40px;
-    padding: 0 12px;
-    background: #10151d;
-    border: 1px solid #303b4a;
-    border-radius: 9px;
-    color: #c2cbd7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 38px;
+    padding: 0 10px;
+    border: 1px solid #303b49;
+    border-radius: 7px;
+    background: #131922;
+    white-space: nowrap;
+    color: #c3ccd8;
   }
-  .toolbar label.hide input { accent-color: #7ed6a5; width: 15px; height: 15px; margin: 0; }
-  .toolbar > button, .hunt-controls button {
-    width: 100%;
-    min-width: 0;
-    min-height: 40px;
-    padding: 9px 10px;
-    border: 1px solid #354356;
-    border-radius: 9px;
-    background: #252f3d;
-    color: #e8edf5;
-    font-size: 12px;
-    font-weight: 600;
-    white-space: normal;
-    transition: background .15s, border-color .15s, transform .15s;
-  }
-  .toolbar > button:hover, .hunt-controls button:hover {
-    background: #334256;
-    border-color: #536984;
-    transform: translateY(-1px);
-  }
-  .toolbar > .progress { grid-column: 1 / -1; padding: 3px 2px 0; }
-  .toolbar select {
-    width: 100%;
-    min-width: 0;
-    min-height: 40px;
-    padding: 8px 10px;
-    border: 1px solid #354356;
-    border-radius: 9px;
-    background: #10151d;
-    color: #e8edf5;
-  }
+  .toolbar label.hide input { accent-color: #7ed6a5; margin: 0; }
   .hunt-controls {
-    grid-column: span 2;
     display: grid;
-    grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
-    gap: 9px;
+    grid-template-columns: minmax(105px, .8fr) minmax(135px, 1.2fr);
+    gap: 7px;
     min-width: 0;
   }
-  .hunt-controls select, .hunt-controls button { width: 100%; min-width: 0; }
-  .hunt-controls button { padding-left: 8px; padding-right: 8px; }
+  .toolbar select, .toolbar button {
+    min-width: 0;
+    min-height: 38px;
+    padding: 8px 10px;
+    border: 1px solid #354152;
+    border-radius: 7px;
+    background: #252e3a;
+    color: #e8edf4;
+    font-size: 12px;
+  }
+  .toolbar select { width: 100%; background: #10151d; }
+  .toolbar button { cursor: pointer; }
+  .toolbar button:hover { background: #303d4d; }
+  .more-tools { position: relative; margin-top: 9px; }
+  .more-tools summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #9daaba;
+    font-size: 12px;
+    cursor: pointer;
+    user-select: none;
+    padding: 5px 2px;
+  }
+  .more-tools summary:hover { color: #eee; }
+  .tool-menu {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    padding-top: 8px;
+  }
+  .tool-menu button { min-height: 34px; padding: 7px 10px; }
+  .toolbar > .progress { display: block; margin-top: 8px; }
+  @media (max-width: 760px) {
+    body { padding: 10px; }
+    .toolbar { padding: 9px; }
+    .toolbar-main { grid-template-columns: minmax(0, 1fr) auto; gap: 7px; }
+    .toolbar-main > input[type=text] { grid-column: 1 / -1; }
+    .toolbar label.hide { justify-content: flex-start; }
+    .hunt-controls { grid-column: 1 / -1; }
+    .tool-menu { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .tool-menu button { width: 100%; }
+  }
   .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
   .stat { background: var(--card); border: 1px solid #333c49; border-radius: 8px; padding: 10px; min-width: 0; }
   .stat-label { color: #9aa4b2; font-size: 11px; }
@@ -215,21 +223,28 @@
 <body>
 <h1>Mythic | Exotic | Dev Chest Tracker</h1>
 <div class="toolbar">
-  <input type="text" id="search" placeholder="Search weapons...">
-  <label class="hide"><input type="checkbox" id="hideGot"> Hide obtained</label>
-  <button id="manageItems">Manage items</button>
-  <button id="reset">Reset all</button>
-  <button id="export">Export progress</button>
-  <button id="import">Import progress</button>
-  <button id="historyBtn">Collection history</button>
-  <div class="hunt-controls">
-    <select id="huntCategory" aria-label="Random hunt category" title="Choose which category to hunt"><option value="all">All items</option><option value="mythic">Mythics</option><option value="exotic">Exotics</option><option value="dev">Dev Chests</option></select>
-    <button id="huntBtn">🎯 Random missing</button>
+  <div class="toolbar-main">
+    <input type="text" id="search" placeholder="Search weapons...">
+    <label class="hide"><input type="checkbox" id="hideGot"> Hide obtained</label>
+    <div class="hunt-controls">
+      <select id="huntCategory" aria-label="Random hunt category" title="Choose which category to hunt"><option value="all">All items</option><option value="mythic">Mythics</option><option value="exotic">Exotics</option><option value="dev">Dev Chests</option></select>
+      <button id="huntBtn">🎯 Random missing</button>
+    </div>
   </div>
-  <button id="statsBtn">📊 Collection stats</button>
-  <button id="undoBtn">↶ Undo last change</button>
-  <button id="copyMissing">Copy missing</button>
-  <button id="copyGot">Copy obtained</button>
+  <details class="more-tools">
+    <summary>More tools</summary>
+    <div class="tool-menu">
+      <button id="manageItems">Manage items</button>
+      <button id="statsBtn">📊 Collection stats</button>
+      <button id="historyBtn">Collection history</button>
+      <button id="undoBtn">↶ Undo last change</button>
+      <button id="copyMissing">Copy missing</button>
+      <button id="copyGot">Copy obtained</button>
+      <button id="export">Export progress</button>
+      <button id="import">Import progress</button>
+      <button id="reset">Reset all</button>
+    </div>
+  </details>
   <input type="file" id="importFile" accept="application/json" style="display:none">
   <span class="progress" id="totalProg">Loading catalogue…</span>
 </div>
