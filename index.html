@@ -202,6 +202,37 @@
   .cell.hunt-target { outline: 3px solid #7ed6a5; outline-offset: 2px; animation: huntPulse .8s ease-in-out 3; }
   @keyframes huntPulse { 50% { box-shadow: 0 0 18px #7ed6a599; } }
   @media (prefers-reduced-motion: reduce) { .cell.hunt-target { animation: none; } }
+
+  .description-bg {
+    position: fixed; inset: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    padding: 18px; background: rgba(5,8,13,.58);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  }
+  .description-bg.hidden { display: none; }
+  .description-card {
+    position: relative; width: min(440px, 100%); max-height: 90vh; overflow: auto;
+    background: #1b222d; border: 1px solid #465366; border-radius: 16px;
+    padding: 20px; box-shadow: 0 22px 80px #000a; text-align: center;
+    animation: descPop .16s ease-out;
+  }
+  @keyframes descPop { from { opacity: 0; transform: translateY(8px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  .description-close {
+    position: absolute; top: 10px; right: 10px; width: 34px; height: 34px;
+    border-radius: 9px; font-size: 20px; line-height: 1;
+  }
+  .description-category { color: #aeb9c8; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; margin: 2px 38px 12px; }
+  .description-tile {
+    width: min(210px, 62vw); aspect-ratio: 1; margin: 0 auto 14px;
+    display: flex; align-items: center; justify-content: center;
+    background: #252e3a; border: 1px solid #3a4658; border-radius: 13px; overflow: hidden;
+  }
+  .description-tile img { width: 100%; height: 100%; object-fit: contain; filter: none !important; }
+  .description-card h3 { margin: 0 28px 10px; font-size: 19px; line-height: 1.25; overflow-wrap: anywhere; }
+  .description-copy { color: #c5ceda; font-size: 14px; line-height: 1.6; text-align: left; white-space: pre-line; }
+  .description-hint { color: #7f8b9b; font-size: 11px; margin-top: 16px; }
+  @media (max-width: 480px) { .description-card { padding: 16px; } .description-tile { width: min(170px, 54vw); } }
+
   .foot { color: #9aa4b2; font-size: 11px; margin-top: 16px; max-width: 900px; }
   code { background: #0f1319; padding: 1px 5px; border-radius: 4px; font-size: 11px; }
   .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; z-index: 50; }
@@ -323,6 +354,18 @@
     <div class="row"><button id="copyCancel">Cancel</button><button id="copyGo">Copy</button></div>
   </div>
 </div>
+
+<div class="description-bg hidden" id="descriptionModal" role="dialog" aria-modal="true" aria-labelledby="descriptionTitle">
+  <div class="description-card">
+    <button class="description-close" id="descriptionClose" aria-label="Close description">×</button>
+    <div class="description-category" id="descriptionCategory"></div>
+    <div class="description-tile" id="descriptionTile"></div>
+    <h3 id="descriptionTitle"></h3>
+    <div class="description-copy" id="descriptionCopy"></div>
+    <div class="description-hint">Right-click another item to inspect it · Esc to close</div>
+  </div>
+</div>
+
 <script>
 const MYTHICS = [];
 const EXOTICS = [];
@@ -335,6 +378,101 @@ const DEVICONS = {
 };
 const LS = "reload-tracker-v1";
 const NAMES = {};
+const ITEM_DESCRIPTIONS = {
+  "m01": "An enhanced Collateral Damage assault rifle built for sustained automatic fire. Its specialty is its powerful impact-focused rounds, making it a hard-hitting all-purpose rifle.",
+  "m02": "An enhanced Holo Twister assault rifle. Its holographic-style sights and controllable automatic fire make it suited to tracking targets at medium range.",
+  "m03": "A powerful Mythic version of the Spire Rifle, designed for accurate, hard-hitting shots at range.",
+  "m04": "An upgraded Pulse Rifle with a fast energy-powered firing pattern. Keep pressure on targets with its rapid bursts of damage.",
+  "m05": "Cerberus' Mythic Gatekeeper Shotgun delivers heavy close-range damage with a rapid three-shot magazine. Land your shots before its brief reload.",
+  "m06": "Midas' golden Drum Gun combines automatic fire with a large magazine, letting you keep enemies under pressure at close to medium range.",
+  "m07": "The Baron's Mammoth-style Double Down Pistol packs heavy damage into a two-shot load before reloading. Make each shot count.",
+  "m08": "The Foundation's MK-Seven is a fast-firing assault rifle with a red-dot sight, built for accurate automatic fire at medium range.",
+  "m09": "A Sideways rifle whose damage ramps up as it approaches overheating. Keep firing to build pressure, but watch its heat.",
+  "m10": "Kit's Shockwave Launcher fires explosive shockwave rounds that launch players away without relying on conventional bullet damage. Useful for displacement and mobility.",
+  "m11": "The Ageless Champion's Shockwave Hammer is a heavy melee weapon that slams enemies and launches its wielder through the air for powerful movement.",
+  "m12": "A rare throwable fish-shaped weapon that instantly eliminates an opponent if it directly hits them. Landing the hit is the hard part.",
+  "m13": "An enhanced Enforcer Assault Rifle with increased damage across ranges, giving it stronger all-round performance than its standard counterpart.",
+  "m14": "Emma Frost's Striker Burst AR fires accurate multi-round bursts, rewarding controlled aim and well-timed shots.",
+  "m15": "A Sideways Minigun that fires faster as it heats up. Sustained fire builds to a fierce stream of bullets, but overheating is a risk.",
+  "m16": "The O.X.R. Rifle is a fully automatic assault rifle designed for reliable precision and range, useful for steady damage at medium distances.",
+  "m17": "An enhanced Sentinel Pump Shotgun built around deliberate, high-impact shots. Best used when you can line up a clean close-range hit.",
+  "m18": "An enhanced Wrecker Revolver that delivers heavy single-shot damage. Its slower pace rewards accuracy over spraying.",
+  "m19": "Oscar's Frenzy Auto Shotgun fires rapidly and holds a large magazine, making it dangerous in close-quarters fights.",
+  "m20": "An enhanced Oni Shotgun built for aggressive close-range combat, with a punchy shot pattern suited to quick engagements.",
+  "m21": "Valeria's Hyper SMG is a rapid-firing automatic weapon designed to overwhelm targets at close range.",
+  "m22": "An enhanced Fury Assault Rifle with improved combat performance, balancing automatic fire with dependable mid-range damage.",
+  "m23": "Midas' Modular Drum Gun pairs a high-capacity magazine with automatic fire. Its modular build gives it a distinctive upgraded feel for sustained fights.",
+  "m24": "The Ringmaster's Boom Bolt is an explosive crossbow tuned for faster aiming and a larger magazine of explosive bolts.",
+  "m25": "The Vector 7 DMR is a precision marksman rifle designed for accurate, deliberate shots at medium to long range.",
+  "m26": "Night Rose's Veiled Precision SMG is a suppressed, precision-focused automatic weapon built to keep pressure on targets while staying comparatively discreet.",
+  "m27": "Ares' Warforged Assault Rifle is a hard-hitting automatic rifle made for sustained combat, with a forceful firing profile.",
+  "m28": "The Sideways Scythe is a melee weapon for sweeping close-range attacks and aggressive movement through a fight.",
+  "m29": "Hades' Harbinger SMG is a fast-firing automatic weapon themed around the underworld, suited to close-range pressure.",
+  "m30": "The Conductor's Hand Cannon is a heavy pistol that fires powerful shots at a slower rate. Aim carefully to make the most of each round.",
+  "m31": "The Foundation's Power Gloves are a melee weapon that lets you punch opponents at close range and use powered movement to close gaps.",
+  "m32": "The Brute Nemesis AR is a Mythic Nemesis rifle with improved body damage but reduced headshot power, favouring consistent hits.",
+  "m33": "An enhanced Havoc Pump Shotgun that deals heavy damage at close range with a slower pump-action firing rhythm.",
+  "m34": "The Pinpoint Iron Pump Shotgun is an upgraded Iron Pump with improved accuracy while aiming down sights.",
+  "m35": "Jules' Glider Gun combines grappling mobility with the ability to redeploy a glider, making it useful for repositioning across the map.",
+  "m36": "Bigfoot's Flex SMG is a personal Flex SMG tuned to deal more damage at a distance than its standard counterpart.",
+  "m37": "The Overdrive Tactical Pistol is a Mythic tactical sidearm designed for quick handling and rapid follow-up shots.",
+  "m38": "An enhanced Surgefire SMG with improved accuracy that removes the usual spread penalty while jumping or moving.",
+  "m39": "Skye's Assault Rifle is a fully automatic, versatile rifle with a strong rate of fire and good accuracy when aiming down sights in controlled bursts.",
+  "m40": "Meowscles' Peow Peow Rifle is a more powerful version of the Heavy Assault Rifle, delivering hard-hitting shots at a measured pace.",
+  "m41": "Brutus' Minigun unleashes a huge volume of bullets from a large magazine. It excels at sustained fire, though its handling is less precise on the move.",
+  "m42": "Midas' Drum Gun is a heavy automatic weapon with high damage, a fast rate of fire and a large magazine. It is most accurate when aimed down sights in short bursts.",
+  "m43": "Skye's Grappler provides repeated grappling mobility with effectively unlimited charges, letting you pull yourself toward surfaces and reposition quickly.",
+  "m44": "An enhanced Twinfire Auto Shotgun built for rapid close-range follow-up shots and sustained pressure.",
+  "m45": "The Two-Shot Shotgun fires a pair of shots in a burst, rewarding aim and timing in close-range fights.",
+  "m46": "The Ageless Champion's Ex-Caliber Rifle fires explosive blades that stick into targets or surfaces before detonating, mixing precision with delayed explosive damage.",
+  "m47": "Megalo Don's Modular Combat Shotgun is a close-range shotgun modified for a forceful, sustained combat style.",
+  "m48": "The Precision Airstrike marks an area for an incoming airstrike, forcing enemies to move or risk taking explosive damage.",
+  "m49": "Thorne's Vampiric Blade is a close-range blade with a vampiric theme, designed for aggressive melee attacks and close-quarters pressure.",
+  "m50": "The Cube Rifle is a mysterious cube-powered rifle that fires energy projectiles at enemies. Its unusual design makes it stand out from conventional firearms.",
+  "e01": "The Heisted Explosive Assault Rifle fires rounds that explode on impact, adding splash damage to standard rifle pressure.",
+  "e02": "The Heisted Accelerant Shotgun gains fire rate as you damage opponents, becoming more dangerous the longer you keep a fight going.",
+  "e03": "The Boom Sniper Rifle fires explosive-tipped shots, letting accurate long-range hits deal additional blast damage around the impact.",
+  "e04": "The Lawless Accelerant Holo Twister AR combines the Holo Twister's sight picture with an accelerant effect that increases its fire rate as you damage enemies.",
+  "e05": "The Lawless Trinity Assault Rifle fires a distinctive three-round pattern, giving it a burst-like rhythm for controlled damage at range.",
+  "e06": "The Lawless Twinfire Slap Shotgun delivers quick twin-fire shotgun blasts, with Slap-themed energy supporting an aggressive close-range playstyle.",
+  "e07": "The Lawless Heavy Impact Tracking Sniper is a heavy sniper built to hit hard, with tracking functionality to help follow marked targets.",
+  "e08": "The Lawless Stink Rifle fires rounds that release a damaging stink cloud, pressuring enemies who stay in the affected area.",
+  "e09": "The Lawless Explosive Mammoth Pistol combines a heavy single-shot pistol with explosive impact damage. Reload between shots and aim carefully.",
+  "e10": "The Lawless Shockwave Rocket Launcher fires rockets that create a shockwave on impact, displacing enemies and opening up repositioning opportunities.",
+  "e11": "The Lawless Slap Cannon fires projectiles while providing Slap energy, mixing combat utility with a burst of stamina-style movement support.",
+  "e12": "The Lawless Slap Jug is a throwable Slap-themed consumable that provides its effect to players in the area, helping the team keep moving.",
+  "e13": "Slapberry Fizz is a throwable fizzy consumable that restores health and grants Slap energy to nearby teammates, supporting both recovery and movement.",
+  "e14": "The Foundation's Rift Rifle is an exotic rifle associated with rift technology, giving its shots a distinctive mobility-focused twist.",
+  "e15": "A spicy pizza slice that restores health and shield while giving a spicy movement boost. A quick snack with a kick.",
+  "e16": "The Unstable Frostfire Shotgun is an unpredictable shotgun with a frosty, fiery effect profile. Its unstable nature makes each pickup a little chaotic.",
+  "e17": "The Unstable Yoink Shotgun is an exotic shotgun with a displacement-style effect, pulling the fight into an unexpected position.",
+  "e18": "The Unstable Voltage Burst Pistol fires bursts of electrical energy, delivering quick multi-shot damage in a compact sidearm.",
+  "e19": "The Unstable Thunderclap DMR is a precision marksman rifle with a thunder-themed effect and hard-hitting shots at range.",
+  "e20": "The Eradicator Hop Rock Fury Assault Rifle combines automatic rifle fire with Hop Rock effects, giving the wielder a bouncy, mobile feel while fighting.",
+  "e21": "The Eradicator O.X.R. Rifle is an upgraded O.X.R. automatic rifle designed for dependable accuracy and damage at range.",
+  "e22": "The left half of Double Trouble: one of a paired set of dual-wield shotguns. Use the pair for rapid close-range blasts.",
+  "e23": "The right half of Double Trouble: the matching second weapon in the paired dual-wield shotgun set, built for close-quarters pressure.",
+  "e24": "The Eradicator Wrecker Revolver is a heavy revolver that hits hard per shot, rewarding precise aim and measured firing.",
+  "e25": "The Eradicator Shadow Precision SMG is a precision-focused SMG with a controlled firing profile, suited to accurate close-to-mid-range tracking.",
+  "e26": "The Eradicator Shock N' Slow Shockwave Launcher fires shockwave rounds that disrupt enemy positioning and can help create space to escape or push.",
+  "e27": "Kado Thorne's Deadeye Assault Rifle is a precision-focused rifle built for accurate shots and steady damage at range.",
+  "e28": "Kado Thorne's Gatekeeper Shotgun is a compact, hard-hitting shotgun designed for fast close-range engagements.",
+  "e29": "Kado Thorne's Monarch Pistol is a powerful semi-automatic sidearm suited to accurate shots and flexible close-range combat.",
+  "e30": "Kado Thorne's Twin Siphon Shotgun is a dual-shotgun style weapon with a siphon effect, rewarding successful close-range damage with survivability.",
+  "e31": "Venomous Dual Fiend Hunters are dual-wield weapons themed around hunting fiends, designed for fast, aggressive close-range attacks.",
+  "e32": "The Hoprock Cube Rifle combines cube-powered projectiles with Hop Rock energy, giving its wielder a distinctive mobile combat style.",
+  "d01": "A special Dev Chest themed around explosive weapons. Its contents are associated with explosive-firepower items from the tracker.",
+  "d02": "A Dev Chest themed around Chapter 2-era loot, featuring a weapon from that chapter's classic arsenal.",
+  "d03": "A pizza-themed Dev Chest associated with the spicy pizza slice exotic.",
+  "d04": "A Deagle-themed Dev Chest associated with a heavy hand cannon-style weapon.",
+  "d05": "An MK-themed Dev Chest associated with the Foundation's MK-Seven Assault Rifle.",
+  "d06": "A Chapter 5-themed Dev Chest associated with Chapter 5 boss weapons and upgraded loot.",
+  "d07": "An Unstable-themed Dev Chest associated with the unpredictable Unstable exotic weapon set.",
+  "d08": "A Lawless-themed Dev Chest associated with the Lawless season's exotic weapon variants.",
+  "d09": "A Boom-themed Dev Chest associated with explosive Boom-style weaponry.",
+  "d10": "An Eradicator-themed Dev Chest associated with upgraded Eradicator weapons, including the Wrecker Revolver."
+};
+
 let state = {got:{}, labels:{}, history:[]};
 if (!Array.isArray(state.history)) state.history = [];
 try { state = Object.assign(state, JSON.parse(localStorage.getItem(LS) || "{}")); } catch(e) {}
@@ -344,6 +482,48 @@ function initials(name){
   if (w.length === 1) return w[0].slice(0,2).toUpperCase();
   return (w[0][0] + (w[1][0] || "")).toUpperCase();
 }
+
+function openDescription(cell){
+  const id = cell.dataset.id;
+  const row = ALL.find(item => item[0] === id);
+  if (!row) return;
+  const [itemId, defaultName, image] = row;
+  const name = state.labels[itemId] || defaultName;
+  const category = itemId.startsWith("m") ? "MYTHIC" : itemId.startsWith("e") ? "EXOTIC" : "DEV CHEST";
+  const modal = document.getElementById("descriptionModal");
+  const tile = document.getElementById("descriptionTile");
+  tile.innerHTML = "";
+  const source = cell.querySelector(".tile img");
+  if (source) {
+    const img = document.createElement("img");
+    img.src = source.currentSrc || source.src;
+    img.alt = name;
+    img.onerror = () => { tile.textContent = initials(name); };
+    tile.appendChild(img);
+  } else {
+    tile.textContent = initials(name);
+  }
+  document.getElementById("descriptionCategory").textContent = category + (state.got[itemId] ? " · OBTAINED" : " · NOT YET OBTAINED");
+  document.getElementById("descriptionTitle").textContent = name;
+  document.getElementById("descriptionCopy").textContent = ITEM_DESCRIPTIONS[itemId] || "A Fortnite Reload item. Description not available yet.";
+  modal.classList.remove("hidden");
+  document.getElementById("descriptionClose").focus();
+}
+function closeDescription(){ document.getElementById("descriptionModal").classList.add("hidden"); }
+document.querySelectorAll(".grid").forEach(grid => grid.addEventListener("contextmenu", ev => {
+  const cell = ev.target.closest(".cell");
+  if (!cell) return;
+  ev.preventDefault();
+  openDescription(cell);
+}));
+document.getElementById("descriptionClose").addEventListener("click", closeDescription);
+document.getElementById("descriptionModal").addEventListener("click", ev => {
+  if (ev.target.id === "descriptionModal") closeDescription();
+});
+document.addEventListener("keydown", ev => {
+  if (ev.key === "Escape") closeDescription();
+});
+
 function build(gridId, items){
   const grid = document.getElementById(gridId);
   items.forEach(([id, defName, low]) => {
