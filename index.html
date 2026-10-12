@@ -126,6 +126,46 @@
   .achievement-toast .toast-desc { font-size:11px; color:#d0d9d4; margin-top:3px; }
   @media(max-width:760px) { .achievement-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
   @media(max-width:420px) { .achievement-grid { grid-template-columns:1fr; } }
+  .advancements-bg { position:fixed; inset:0; z-index:150; padding:clamp(10px,2vw,26px); display:flex; align-items:center; justify-content:center; background:rgba(5,8,13,.68); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
+  .advancements-bg.hidden { display:none; }
+  .advancements-screen { width:min(1180px,100%); height:min(850px,94vh); display:flex; flex-direction:column; overflow:hidden; background:linear-gradient(145deg,#1b222d,#121720); border:1px solid #465366; border-radius:17px; box-shadow:0 24px 90px #000b; animation:descPop .18s ease-out; }
+  .advancements-header { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:20px 22px 16px; border-bottom:1px solid #303b49; }
+  .advancements-kicker { color:#7ed6a5; font-size:10px; font-weight:800; letter-spacing:.18em; }
+  .advancements-header h2 { margin:5px 0 4px; font-size:23px; }
+  .advancements-subtitle { color:#9aa4b2; font-size:12px; }
+  .advancements-header-actions { display:flex; align-items:center; gap:12px; flex-shrink:0; }
+  #achievementCount { color:#9aefbd; font-size:12px; font-weight:700; white-space:nowrap; }
+  .advancements-header-actions button { min-height:36px; white-space:nowrap; }
+  .advancements-layout { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(260px,.75fr); gap:18px; padding:18px; flex:1; min-height:0; }
+  .advancements-list-wrap { min-width:0; display:flex; flex-direction:column; min-height:0; }
+  .advancements-list-label { color:#7f8b9b; font-size:10px; letter-spacing:.12em; font-weight:800; margin:0 0 10px 2px; }
+  .advancement-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; overflow:auto; padding:2px 5px 5px 2px; align-content:start; }
+  .advancement-card { display:flex; align-items:center; gap:11px; text-align:left; min-width:0; padding:11px; min-height:72px; border:1px solid #354152; border-radius:10px; background:#151b24; color:#e8edf4; cursor:pointer; transition:border-color .12s,background .12s,transform .12s; }
+  .advancement-card:hover,.advancement-card:focus-visible,.advancement-card.selected { border-color:#8ba4c2; background:#202a37; outline:none; }
+  .advancement-card:hover { transform:translateY(-1px); }
+  .advancement-card.unlocked { border-color:#416d58; background:linear-gradient(135deg,#1a2a24,#17212a); }
+  .advancement-card.unlocked:hover,.advancement-card.unlocked.selected { border-color:#7ed6a5; background:linear-gradient(135deg,#20392d,#1a2730); }
+  .advancement-badge { flex:0 0 43px; width:43px; height:43px; display:grid; place-items:center; border-radius:9px; background:#28313e; border:1px solid #3d4a5c; font-size:23px; filter:grayscale(1); }
+  .advancement-card.unlocked .advancement-badge { filter:none; background:#244333; border-color:#49765d; }
+  .advancement-card-copy { min-width:0; flex:1; }
+  .advancement-name { font-size:12px; font-weight:800; line-height:1.3; overflow-wrap:anywhere; }
+  .advancement-short { margin-top:4px; color:#9aa4b2; font-size:10px; line-height:1.35; }
+  .advancement-state { font-size:9px; font-weight:800; letter-spacing:.05em; color:#aeb9c8; margin-top:5px; }
+  .advancement-card.unlocked .advancement-state { color:#9aefbd; }
+  .advancement-detail { align-self:stretch; min-width:0; overflow:auto; display:flex; flex-direction:column; align-items:center; text-align:center; padding:22px 18px; background:rgba(9,13,19,.46); border:1px solid #303b49; border-radius:13px; }
+  .advancement-detail-empty { margin:auto; max-width:200px; color:#7f8b9b; font-size:12px; line-height:1.6; }
+  .advancement-detail .detail-rank { align-self:stretch; color:#7ed6a5; font-size:10px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; }
+  .advancement-detail .detail-icon { display:grid; place-items:center; width:104px; height:104px; margin:17px 0 14px; border-radius:18px; border:1px solid #465366; background:radial-gradient(circle at 50% 25%,#384454,#202936 72%); font-size:52px; filter:grayscale(1); }
+  .advancement-detail.unlocked .detail-icon { filter:none; border-color:#7ed6a5; background:radial-gradient(circle at 50% 25%,#315640,#1b2b24 72%); box-shadow:0 0 28px #7ed6a522; }
+  .advancement-detail h3 { font-size:20px; line-height:1.25; margin:0 0 9px; overflow-wrap:anywhere; }
+  .advancement-detail .detail-status { font-size:10px; font-weight:800; letter-spacing:.1em; padding:5px 9px; border:1px solid #465366; border-radius:99px; color:#aeb9c8; }
+  .advancement-detail.unlocked .detail-status { color:#9aefbd; border-color:#49765d; background:#1b3025; }
+  .advancement-detail .detail-description { color:#c5ceda; font-size:13px; line-height:1.65; margin:17px 0 13px; text-align:left; align-self:stretch; }
+  .advancement-detail .detail-requirement { align-self:stretch; text-align:left; margin-top:auto; padding:12px; border-radius:9px; background:#171e28; border:1px solid #303b49; font-size:11px; line-height:1.5; color:#b8c3d1; }
+  .advancement-detail .detail-requirement strong { display:block; color:#e8edf4; font-size:10px; letter-spacing:.08em; margin-bottom:4px; }
+  .advancements-footer { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; padding:11px 20px; border-top:1px solid #303b49; color:#7f8b9b; font-size:10px; }
+  @media(max-width:760px) { .advancements-bg { padding:7px; } .advancements-screen { height:96vh; border-radius:12px; } .advancements-header { padding:14px; align-items:flex-start; } .advancements-header h2 { font-size:20px; } .advancements-header-actions { flex-direction:column-reverse; align-items:flex-end; gap:7px; } .advancements-layout { grid-template-columns:1fr; grid-template-rows:minmax(0,1fr) auto; gap:10px; padding:10px; } .advancement-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .advancement-detail { max-height:245px; padding:12px; } .advancement-detail .detail-icon { width:55px; height:55px; margin:8px 0; font-size:30px; border-radius:10px; } .advancement-detail h3 { font-size:16px; } .advancement-detail .detail-description { margin:9px 0; } .advancement-detail .detail-requirement { margin-top:0; } }
+  @media(max-width:440px) { .advancements-header { gap:8px; } .advancements-subtitle { max-width:200px; line-height:1.4; } .advancements-header-actions button { font-size:10px; padding:6px 8px; } .advancement-grid { grid-template-columns:1fr; } .advancement-card { min-height:62px; } .advancements-footer { padding:9px 12px; } }
   @media (max-width: 700px) {
     body { padding: 10px; }
     .toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; padding: 10px; border-radius: 11px; }
@@ -286,6 +326,7 @@
     <div class="tool-menu">
       <button id="manageItems">Manage items</button>
       <button id="statsBtn">📊 Collection stats</button>
+      <button id="advancementsBtn">🏆 Advancements</button>
       <button id="historyBtn">Collection history</button>
       <button id="undoBtn">↶ Undo last change</button>
       <button id="copyMissing">Copy missing</button>
@@ -310,11 +351,14 @@
   <div class="bar" style="margin:10px 0 0"><div id="milestoneBar" style="background:#7ed6a5"></div></div>
   <div class="milestone-track" id="milestoneTrack"></div>
 </div>
-<div class="achievement-panel">
-  <div class="achievement-head"><strong>🎖️ Collector achievements</strong><span id="achievementCount">Loading achievements…</span></div>
-  <div class="achievement-grid" id="achievementGrid"></div>
-</div>
 <div class="achievement-toast" id="achievementToast" role="status" aria-live="polite"><span class="toast-icon" id="achievementToastIcon">🏆</span><div><div class="toast-title" id="achievementToastTitle">Achievement unlocked!</div><div class="toast-desc" id="achievementToastDesc"></div></div></div>
+<div class="advancements-bg hidden" id="advancementsModal" role="dialog" aria-modal="true" aria-labelledby="advancementsTitle">
+  <section class="advancements-screen">
+    <header class="advancements-header"><div><div class="advancements-kicker">RELOAD COLLECTION</div><h2 id="advancementsTitle">🏆 Advancements</h2><div class="advancements-subtitle" id="advancementsSubtitle">Track your journey from first find to full completion.</div></div><div class="advancements-header-actions"><span id="achievementCount">0 / 13 unlocked</span><button id="advancementsClose" aria-label="Close advancements">✕ Close</button></div></header>
+    <div class="advancements-layout"><div class="advancements-list-wrap"><div class="advancements-list-label">ACHIEVEMENTS · EASIEST TO HARDEST</div><div class="advancement-grid" id="achievementGrid"></div></div><aside class="advancement-detail" id="advancementDetail" aria-live="polite"><div class="advancement-detail-empty">Hover over an advancement to inspect it.</div></aside></div>
+    <div class="advancements-footer"><span>Hover or focus an advancement to inspect it · Esc to close</span><span id="advancementProgressSummary"></span></div>
+  </section>
+</div>
 
 <h2><span class="dot" style="background:var(--mythic)"></span> MYTHICS <span id="mProg" style="color:#9aa4b2;font-weight:400"></span></h2>
 <div class="bar"><div id="mythicBar" style="background:var(--mythic)"></div></div>
@@ -602,19 +646,19 @@ function build(gridId, items){
 }
 const MILESTONES = [25, 50, 75, 90, 100];
 const ACHIEVEMENTS = [
-  {id:"first",icon:"✨",title:"First Discovery",desc:"Obtain your first catalogue item.",test:s=>s.totalGot>=1},
-  {id:"ten",icon:"🔟",title:"Getting Started",desc:"Collect 10 items.",test:s=>s.totalGot>=10},
-  {id:"twentyfive",icon:"🧰",title:"Arsenal Builder",desc:"Collect 25 items.",test:s=>s.totalGot>=25},
-  {id:"fifty",icon:"💎",title:"Serious Collector",desc:"Collect 50 items.",test:s=>s.totalGot>=50},
-  {id:"quarter",icon:"🥉",title:"Quarter Way",desc:"Reach 25% of the full catalogue.",test:s=>s.pct>=25},
-  {id:"half",icon:"🥈",title:"Halfway Hero",desc:"Reach 50% of the full catalogue.",test:s=>s.pct>=50},
-  {id:"threequarters",icon:"🥇",title:"Nearly There",desc:"Reach 75% of the full catalogue.",test:s=>s.pct>=75},
-  {id:"complete",icon:"👑",title:"Completionist",desc:"Collect every item, including Dev Chests.",test:s=>s.totalGot===s.total&&s.total>0},
-  {id:"mythics",icon:"🟠",title:"Mythic Master",desc:"Collect every Mythic weapon.",test:s=>s.mGot===MYTHICS.length&&MYTHICS.length>0},
-  {id:"exotics",icon:"🔷",title:"Exotic Expert",desc:"Collect every Exotic weapon.",test:s=>s.eGot===EXOTICS.length&&EXOTICS.length>0},
-  {id:"devfirst",icon:"🗝️",title:"Chest Cracker",desc:"Find your first Dev Chest entry.",test:s=>s.dGot>=1},
-  {id:"devall",icon:"📦",title:"Chest Conqueror",desc:"Collect every Dev Chest entry.",test:s=>s.dGot===DEVCHESTS.length&&DEVCHESTS.length>0},
-  {id:"weapons",icon:"⚔️",title:"Armed to the Teeth",desc:"Collect every Mythic and Exotic weapon.",test:s=>s.wGot===WEAPONS.length&&WEAPONS.length>0}
+  {id:"first",icon:"✨",title:"First Discovery",desc:"Obtain your first catalogue item.",requirement:"Mark any one item in the catalogue as obtained.",test:s=>s.totalGot>=1},
+  {id:"devfirst",icon:"🗝️",title:"Chest Cracker",desc:"Find your first Dev Chest entry.",requirement:"Mark any one Dev Chest entry as obtained.",test:s=>s.dGot>=1},
+  {id:"ten",icon:"🔟",title:"Getting Started",desc:"Collect 10 items.",requirement:"Obtain any 10 entries from the full catalogue.",test:s=>s.totalGot>=10},
+  {id:"quarter",icon:"🥉",title:"Quarter Way",desc:"Reach 25% of the full catalogue.",requirement:"Obtain at least 25% of every entry currently in the catalogue.",test:s=>s.pct>=25},
+  {id:"twentyfive",icon:"🧰",title:"Arsenal Builder",desc:"Collect 25 items.",requirement:"Obtain any 25 entries from the full catalogue.",test:s=>s.totalGot>=25},
+  {id:"devall",icon:"📦",title:"Chest Conqueror",desc:"Collect every Dev Chest entry.",requirement:"Mark every Dev Chest entry as obtained.",test:s=>s.dGot===DEVCHESTS.length&&DEVCHESTS.length>0},
+  {id:"exotics",icon:"🔷",title:"Exotic Expert",desc:"Collect every Exotic weapon.",requirement:"Mark every Exotic weapon as obtained.",test:s=>s.eGot===EXOTICS.length&&EXOTICS.length>0},
+  {id:"half",icon:"🥈",title:"Halfway Hero",desc:"Reach 50% of the full catalogue.",requirement:"Obtain at least half of every entry currently in the catalogue.",test:s=>s.pct>=50},
+  {id:"fifty",icon:"💎",title:"Serious Collector",desc:"Collect 50 items.",requirement:"Obtain any 50 entries from the full catalogue.",test:s=>s.totalGot>=50},
+  {id:"mythics",icon:"🟠",title:"Mythic Master",desc:"Collect every Mythic weapon.",requirement:"Mark every Mythic weapon as obtained.",test:s=>s.mGot===MYTHICS.length&&MYTHICS.length>0},
+  {id:"threequarters",icon:"🥇",title:"Nearly There",desc:"Reach 75% of the full catalogue.",requirement:"Obtain at least 75% of every entry currently in the catalogue.",test:s=>s.pct>=75},
+  {id:"weapons",icon:"⚔️",title:"Armed to the Teeth",desc:"Collect every Mythic and Exotic weapon.",requirement:"Obtain every Mythic and Exotic weapon. Dev Chest entries are not required.",test:s=>s.wGot===WEAPONS.length&&WEAPONS.length>0},
+  {id:"complete",icon:"👑",title:"Completionist",desc:"Collect every item, including Dev Chests.",requirement:"Obtain every Mythic, every Exotic, and every Dev Chest entry.",test:s=>s.totalGot===s.total&&s.total>0}
 ];
 function achievementSnapshot(){
   const total=ALL.length, totalGot=ALL.filter(([id])=>!!state.got[id]).length;
@@ -639,17 +683,52 @@ function renderAchievements(newlyUnlocked=[]){
   grid.innerHTML="";
   const unlocked=ACHIEVEMENTS.filter(a=>a.test(snap));
   document.getElementById("achievementCount").textContent=unlocked.length+" / "+ACHIEVEMENTS.length+" unlocked";
-  ACHIEVEMENTS.forEach(a=>{
-    const done=a.test(snap), card=document.createElement("div");
-    card.className="achievement"+(done?" unlocked":"");
-    const icon=document.createElement("div"); icon.className="achievement-icon"; icon.textContent=done?a.icon:"🔒";
-    const copy=document.createElement("div");
-    const title=document.createElement("div"); title.className="achievement-title"; title.textContent=a.title;
-    const desc=document.createElement("div"); desc.className="achievement-desc"; desc.textContent=a.desc;
-    copy.append(title,desc); card.append(icon,copy); grid.appendChild(card);
+  document.getElementById("advancementProgressSummary").textContent=snap.totalGot+" / "+snap.total+" catalogue entries collected";
+  ACHIEVEMENTS.forEach((a,index)=>{
+    const done=a.test(snap), card=document.createElement("button");
+    card.type="button";
+    card.className="advancement-card"+(done?" unlocked":"");
+    card.dataset.achievementId=a.id;
+    card.setAttribute("aria-label",a.title+". "+(done?"Unlocked":"Locked"));
+    const icon=document.createElement("div"); icon.className="advancement-badge"; icon.textContent=done?a.icon:"🔒";
+    const copy=document.createElement("div"); copy.className="advancement-card-copy";
+    const title=document.createElement("div"); title.className="advancement-name"; title.textContent=(index+1)+". "+a.title;
+    const short=document.createElement("div"); short.className="advancement-short"; short.textContent=a.desc;
+    const status=document.createElement("div"); status.className="advancement-state"; status.textContent=done?"✓ UNLOCKED":"🔒 LOCKED";
+    copy.append(title,short,status); card.append(icon,copy);
+    card.addEventListener("mouseenter",()=>showAdvancementDetail(a,index));
+    card.addEventListener("focus",()=>showAdvancementDetail(a,index));
+    card.addEventListener("click",()=>showAdvancementDetail(a,index));
+    grid.appendChild(card);
   });
+  if(!document.querySelector("#advancementGrid .selected")) showAdvancementDetail(ACHIEVEMENTS[0],0);
   if(newlyUnlocked.length) showAchievementToast(newlyUnlocked[0]);
 }
+function showAdvancementDetail(a,index){
+  const snap=achievementSnapshot(), done=a.test(snap), detail=document.getElementById("advancementDetail");
+  if(!detail)return;
+  detail.className="advancement-detail"+(done?" unlocked":"");
+  detail.innerHTML="";
+  const rank=document.createElement("div"); rank.className="detail-rank"; rank.textContent="ADVANCEMENT "+String(index+1).padStart(2,"0")+" / "+String(ACHIEVEMENTS.length).padStart(2,"0");
+  const icon=document.createElement("div"); icon.className="detail-icon"; icon.textContent=done?a.icon:"🔒";
+  const title=document.createElement("h3"); title.textContent=a.title;
+  const status=document.createElement("div"); status.className="detail-status"; status.textContent=done?"✓ UNLOCKED":"🔒 NOT UNLOCKED";
+  const desc=document.createElement("div"); desc.className="detail-description"; desc.textContent=a.desc;
+  const req=document.createElement("div"); req.className="detail-requirement";
+  const reqTitle=document.createElement("strong"); reqTitle.textContent="HOW TO UNLOCK";
+  const reqText=document.createElement("span"); reqText.textContent=a.requirement;
+  req.append(reqTitle,reqText); detail.append(rank,icon,title,status,desc,req);
+  document.querySelectorAll(".advancement-card").forEach(card=>card.classList.toggle("selected",card.dataset.achievementId===a.id));
+}
+function openAdvancements(){
+  renderAchievements();
+  document.getElementById("advancementsModal").classList.remove("hidden");
+}
+function closeAdvancements(){document.getElementById("advancementsModal").classList.add("hidden");}
+document.getElementById("advancementsBtn").addEventListener("click",openAdvancements);
+document.getElementById("advancementsClose").addEventListener("click",closeAdvancements);
+document.getElementById("advancementsModal").addEventListener("click",ev=>{if(ev.target.id==="advancementsModal")closeAdvancements();});
+
 function updateStats(newlyUnlocked=[]){
   const total = ALL.length;
   const got = ALL.filter(([id]) => !!state.got[id]).length;
@@ -975,6 +1054,7 @@ document.addEventListener("keydown", ev => {
     document.getElementById("historyModal").classList.add("hidden");
     document.getElementById("managerModal").classList.add("hidden");
     document.getElementById("statsModal").classList.add("hidden");
+    closeAdvancements();
   }
 });
 
