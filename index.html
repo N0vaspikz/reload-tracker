@@ -18,6 +18,9 @@
   .toolbar > input[type=text], .toolbar > .progress { grid-column: 1 / -1; }
   .toolbar label.hide { grid-column: 1 / -1; }
   .toolbar select { min-width: 0; width: 100%; background: #0f1319; border: 1px solid #333c49; color: #eee; padding: 7px 8px; border-radius: 6px; }
+  .hunt-controls { grid-column: span 2; display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 6px; min-width: 0; }
+  .hunt-controls select, .hunt-controls button { width: 100%; min-width: 0; height: 100%; }
+  .hunt-controls button { padding-left: 6px; padding-right: 6px; }
   .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
   .stat { background: var(--card); border: 1px solid #333c49; border-radius: 8px; padding: 10px; min-width: 0; }
   .stat-label { color: #9aa4b2; font-size: 11px; }
@@ -27,7 +30,7 @@
   .milestone-track { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; margin-top: 10px; }
   .milestone-step { text-align: center; border-radius: 5px; padding: 7px 2px; font-size: 10px; color: #9aa4b2; background: #0f1319; border: 1px solid #333c49; }
   .milestone-step.done { color: #7ed6a5; border-color: #7ed6a5; background: #193027; }
-  @media (max-width: 520px) { body { padding: 10px; } .toolbar { gap: 6px; } .toolbar > button { padding: 7px 4px; font-size: 11px; } .stats { gap: 5px; } .stat { padding: 7px; } .stat-value { font-size: 15px; } }
+  @media (max-width: 520px) { body { padding: 10px; } .toolbar { gap: 6px; } .toolbar > button { padding: 7px 4px; font-size: 11px; } .hunt-controls { grid-column: 1 / -1; } .hunt-controls button { font-size: 12px; } .stats { gap: 5px; } .stat { padding: 7px; } .stat-value { font-size: 15px; } }
   .toolbar input[type=text] { background: #0f1319; border: 1px solid #333c49; color: #eee; padding: 6px 10px; border-radius: 6px; width: 220px; }
   button { background: #2b3542; color: #eee; border: 1px solid #3d4a5c; border-radius: 6px; padding: 6px 12px; cursor: pointer; }
   button:hover { background: #374354; }
@@ -135,8 +138,10 @@
   <button id="export">Export progress</button>
   <button id="import">Import progress</button>
   <button id="historyBtn">Collection history</button>
-  <select id="huntCategory" aria-label="Random hunt category" title="Choose which category to hunt"><option value="all">Hunt: All items</option><option value="mythic">Hunt: Mythics</option><option value="exotic">Hunt: Exotics</option><option value="dev">Hunt: Dev Chests</option></select>
-  <button id="huntBtn">🎯 Random missing</button>
+  <div class="hunt-controls">
+    <select id="huntCategory" aria-label="Random hunt category" title="Choose which category to hunt"><option value="all">All items</option><option value="mythic">Mythics</option><option value="exotic">Exotics</option><option value="dev">Dev Chests</option></select>
+    <button id="huntBtn">🎯 Random missing</button>
+  </div>
   <button id="statsBtn">📊 Collection stats</button>
   <button id="undoBtn">↶ Undo last change</button>
   <button id="copyMissing">Copy missing</button>
