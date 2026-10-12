@@ -646,19 +646,19 @@ function build(gridId, items){
 }
 const MILESTONES = [25, 50, 75, 90, 100];
 const ACHIEVEMENTS = [
-  {id:"first",icon:"✨",title:"First Discovery",desc:"Obtain your first catalogue item.",requirement:"Mark any one item in the catalogue as obtained.",test:s=>s.totalGot>=1},
-  {id:"devfirst",icon:"🗝️",title:"Chest Cracker",desc:"Find your first Dev Chest entry.",requirement:"Mark any one Dev Chest entry as obtained.",test:s=>s.dGot>=1},
-  {id:"ten",icon:"🔟",title:"Getting Started",desc:"Collect 10 items.",requirement:"Obtain any 10 entries from the full catalogue.",test:s=>s.totalGot>=10},
-  {id:"quarter",icon:"🥉",title:"Quarter Way",desc:"Reach 25% of the full catalogue.",requirement:"Obtain at least 25% of every entry currently in the catalogue.",test:s=>s.pct>=25},
-  {id:"twentyfive",icon:"🧰",title:"Arsenal Builder",desc:"Collect 25 items.",requirement:"Obtain any 25 entries from the full catalogue.",test:s=>s.totalGot>=25},
-  {id:"devall",icon:"📦",title:"Chest Conqueror",desc:"Collect every Dev Chest entry.",requirement:"Mark every Dev Chest entry as obtained.",test:s=>s.dGot===DEVCHESTS.length&&DEVCHESTS.length>0},
-  {id:"exotics",icon:"🔷",title:"Exotic Expert",desc:"Collect every Exotic weapon.",requirement:"Mark every Exotic weapon as obtained.",test:s=>s.eGot===EXOTICS.length&&EXOTICS.length>0},
-  {id:"half",icon:"🥈",title:"Halfway Hero",desc:"Reach 50% of the full catalogue.",requirement:"Obtain at least half of every entry currently in the catalogue.",test:s=>s.pct>=50},
-  {id:"fifty",icon:"💎",title:"Serious Collector",desc:"Collect 50 items.",requirement:"Obtain any 50 entries from the full catalogue.",test:s=>s.totalGot>=50},
-  {id:"mythics",icon:"🟠",title:"Mythic Master",desc:"Collect every Mythic weapon.",requirement:"Mark every Mythic weapon as obtained.",test:s=>s.mGot===MYTHICS.length&&MYTHICS.length>0},
-  {id:"threequarters",icon:"🥇",title:"Nearly There",desc:"Reach 75% of the full catalogue.",requirement:"Obtain at least 75% of every entry currently in the catalogue.",test:s=>s.pct>=75},
-  {id:"weapons",icon:"⚔️",title:"Armed to the Teeth",desc:"Collect every Mythic and Exotic weapon.",requirement:"Obtain every Mythic and Exotic weapon. Dev Chest entries are not required.",test:s=>s.wGot===WEAPONS.length&&WEAPONS.length>0},
-  {id:"complete",icon:"👑",title:"Completionist",desc:"Collect every item, including Dev Chests.",requirement:"Obtain every Mythic, every Exotic, and every Dev Chest entry.",test:s=>s.totalGot===s.total&&s.total>0}
+  {id:"first",rank:"BRONZE I",icon:"✨",title:"First Discovery",desc:"Obtain your first catalogue item.",requirement:"Mark any one item in the catalogue as obtained.",test:s=>s.totalGot>=1},
+  {id:"ten",rank:"BRONZE III",icon:"🔟",title:"Getting Started",desc:"Collect 10 items.",requirement:"Obtain any 10 entries from the full catalogue.",test:s=>s.totalGot>=10},
+  {id:"quarter",rank:"SILVER I",icon:"🥉",title:"Quarter Way",desc:"Reach 25% of the full catalogue.",requirement:"Obtain at least 25% of every entry currently in the catalogue.",test:s=>s.pct>=25},
+  {id:"twentyfive",rank:"SILVER III",icon:"🧰",title:"Arsenal Builder",desc:"Collect 25 items.",requirement:"Obtain any 25 entries from the full catalogue.",test:s=>s.totalGot>=25},
+  {id:"fifty",rank:"GOLD I",icon:"💎",title:"Serious Collector",desc:"Collect 50 items.",requirement:"Obtain any 50 entries from the full catalogue.",test:s=>s.totalGot>=50},
+  {id:"half",rank:"GOLD III",icon:"🥈",title:"Halfway Hero",desc:"Reach 50% of the full catalogue.",requirement:"Obtain at least half of every entry currently in the catalogue.",test:s=>s.pct>=50},
+  {id:"threequarters",rank:"PLATINUM I",icon:"🥇",title:"Nearly There",desc:"Reach 75% of the full catalogue.",requirement:"Obtain at least 75% of every entry currently in the catalogue.",test:s=>s.pct>=75},
+  {id:"exotics",rank:"DIAMOND I",icon:"🔷",title:"Exotic Expert",desc:"Collect every Exotic weapon.",requirement:"Mark every Exotic weapon as obtained.",test:s=>s.eGot===EXOTICS.length&&EXOTICS.length>0},
+  {id:"mythics",rank:"DIAMOND III",icon:"🟠",title:"Mythic Master",desc:"Collect every Mythic weapon.",requirement:"Mark every Mythic weapon as obtained.",test:s=>s.mGot===MYTHICS.length&&MYTHICS.length>0},
+  {id:"devfirst",rank:"ELITE",icon:"🗝️",title:"Chest Cracker",desc:"Find your first Dev Chest entry.",requirement:"Mark any one Dev Chest entry as obtained. Dev Chest entries are treated as a rarer milestone because finding the chests themselves is a challenge.",test:s=>s.dGot>=1},
+  {id:"devall",rank:"CHAMPION",icon:"📦",title:"Chest Conqueror",desc:"Collect every Dev Chest entry.",requirement:"Mark all "+DEVCHESTS.length+" Dev Chest entries as obtained. This is a dedicated high-difficulty challenge, not an early-game freebie.",test:s=>s.dGot===DEVCHESTS.length&&DEVCHESTS.length>0},
+  {id:"weapons",rank:"UNREAL",icon:"⚔️",title:"Armed to the Teeth",desc:"Collect every Mythic and Exotic weapon.",requirement:"Obtain every Mythic and Exotic weapon. Dev Chest entries are not required.",test:s=>s.wGot===WEAPONS.length&&WEAPONS.length>0},
+  {id:"complete",rank:"UNREAL • 100%",icon:"👑",title:"Completionist",desc:"Collect every item, including Dev Chests.",requirement:"Obtain every Mythic, every Exotic, and every Dev Chest entry. True full completion.",test:s=>s.totalGot===s.total&&s.total>0}
 ];
 function achievementSnapshot(){
   const total=ALL.length, totalGot=ALL.filter(([id])=>!!state.got[id]).length;
@@ -709,7 +709,7 @@ function showAdvancementDetail(a,index){
   if(!detail)return;
   detail.className="advancement-detail"+(done?" unlocked":"");
   detail.innerHTML="";
-  const rank=document.createElement("div"); rank.className="detail-rank"; rank.textContent="ADVANCEMENT "+String(index+1).padStart(2,"0")+" / "+String(ACHIEVEMENTS.length).padStart(2,"0");
+  const rank=document.createElement("div"); rank.className="detail-rank"; rank.textContent=a.rank+" RANK · ADVANCEMENT "+String(index+1).padStart(2,"0")+" / "+String(ACHIEVEMENTS.length).padStart(2,"0");
   const icon=document.createElement("div"); icon.className="detail-icon"; icon.textContent=done?a.icon:"🔒";
   const title=document.createElement("h3"); title.textContent=a.title;
   const status=document.createElement("div"); status.className="detail-status"; status.textContent=done?"✓ UNLOCKED":"🔒 NOT UNLOCKED";
