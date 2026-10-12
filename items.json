@@ -296,6 +296,12 @@
       "image": "cell-m49.png"
     },
     {
+      "id": "m50",
+      "name": "Cube Rifle",
+      "category": "mythic",
+      "image": "cell-m50.png"
+    },
+    {
       "id": "e01",
       "name": "Heisted Explosive Assault Rifle",
       "category": "exotic",
