@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reload Mythic / Exotic Tracker</title>
+<style>
+  :root { --mythic: #f5a623; --exotic: #29b6f6; --bg: #14181f; --card: #1e242e; }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: #eee; font-family: Segoe UI, Arial, sans-serif; margin: 0; padding: 16px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .sub { color: #9aa4b2; font-size: 12px; margin-bottom: 12px; }
+  .toolbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+  .toolbar input[type=text] { background: #0f1319; border: 1px solid #333c49; color: #eee; padding: 6px 10px; border-radius: 6px; width: 220px; }
+  button { background: #2b3542; color: #eee; border: 1px solid #3d4a5c; border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+  button:hover { background: #374354; }
+  label.hide { font-size: 13px; color: #9aa4b2; display: flex; gap: 6px; align-items: center; }
+  .progress { font-size: 14px; font-weight: 600; flex-basis: 100%; }
+  .bar { height: 8px; background: #0f1319; border-radius: 4px; overflow: hidden; margin: 4px 0 14px; }
+  .bar > div { height: 100%; width: 0%; transition: width .2s; }
+  h2 { font-size: 15px; margin: 18px 0 6px; display: flex; align-items: center; gap: 8px; }
+  .dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+  .grid { display: grid; grid-template-columns: repeat(15, 1fr); gap: 6px; }
+  @media (max-width: 1100px) { .grid { grid-template-columns: repeat(10, 1fr); } }
+  @media (max-width: 700px) { .grid { grid-template-columns: repeat(5, 1fr); } }
+  .cell { background: var(--card); border: 2px solid transparent; border-radius: 8px; padding: 6px 4px; text-align: center; cursor: pointer; opacity: .32; transition: opacity .12s, border-color .12s, transform .12s; user-select: none; }
+  .cell:hover { transform: scale(1.05); }
+  .cell.got { opacity: 1; }
+  .mythic .cell.got { border-color: var(--mythic); box-shadow: 0 0 8px #f5a62366; }
+  .exotic .cell.got { border-color: var(--exotic); box-shadow: 0 0 8px #29b6f666; }
+  .dev .cell.got { border-color: #c778ff; box-shadow: 0 0 8px #c778ff66; }
+  .dev .tile { background: linear-gradient(135deg, #6a1b9a, #e040fb); }
+  .mythic .tile { background: linear-gradient(135deg, #b97a12, #f5c04a); }
+  .exotic .tile { background: linear-gradient(135deg, #0f7fb5, #4fd2ff); }
+  .tile { width: 100%; aspect-ratio: 1; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; color: #101318; overflow: hidden; }
+  .tile img { width: 100%; height: 100%; object-fit: contain; }
+  .name { font-size: 9.5px; line-height: 1.2; margin-top: 4px; min-height: 23px; color: #cfd6e0; word-break: break-word; }
+  .cell .conf { font-size: 8px; color: #e0a63c; }
+  .cell.hidden { display: none; }
+  .foot { color: #9aa4b2; font-size: 11px; margin-top: 16px; max-width: 900px; }
+  code { background: #0f1319; padding: 1px 5px; border-radius: 4px; font-size: 11px; }
+  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; z-index: 50; }
+  .modal-bg.hidden { display: none; }
+  .modal { background: var(--card); border: 1px solid #3d4a5c; border-radius: 10px; padding: 18px 20px; min-width: 250px; }
+  .modal h3 { margin: 0 0 8px; font-size: 15px; }
+  .modal label { display: flex; gap: 8px; align-items: center; font-size: 14px; margin: 10px 0; cursor: pointer; }
+  .modal .row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }
+</style>
+</head>
+<body>
+<h1>Mythic / Exotic Tracker</h1>
+<div class="toolbar">
+  <input type="text" id="search" placeholder="Search weapons...">
+  <label class="hide"><input type="checkbox" id="hideGot"> Hide obtained</label>
+  <button id="reset">Reset all</button>
+  <button id="export">Export progress</button>
+  <button id="import">Import progress</button>
+  <button id="copyMissing">Copy missing</button>
+  <button id="copyGot">Copy obtained</button>
+  <input type="file" id="importFile" accept="application/json" style="display:none">
+  <br>
+  <span class="progress" id="totalProg">0 / 79 obtained (0%)</span>
+</div>
+
+<div class="bar"><div id="totalBar" style="background:linear-gradient(90deg,var(--mythic),var(--exotic))"></div></div>
+
+<h2><span class="dot" style="background:var(--mythic)"></span> MYTHICS <span id="mProg" style="color:#9aa4b2;font-weight:400"></span></h2>
+<div class="bar"><div id="mythicBar" style="background:var(--mythic)"></div></div>
+<div class="grid mythic" id="mythicGrid"></div>
+
+<h2><span class="dot" style="background:var(--exotic)"></span> EXOTICS <span id="eProg" style="color:#9aa4b2;font-weight:400"></span></h2>
+<div class="bar"><div id="exoticBar" style="background:var(--exotic)"></div></div>
+<div class="grid exotic" id="exoticGrid"></div>
+
+<h2><span class="dot" style="background:#c778ff"></span> DEV CHESTS <span id="dProg" style="color:#9aa4b2;font-weight:400"></span></h2>
+<div class="bar"><div id="devBar" style="background:#c778ff"></div></div>
+<div class="grid dev" id="devGrid"></div>
+
+<div class="modal-bg hidden" id="copyModal">
+  <div class="modal">
+    <h3 id="copyTitle">Copy</h3>
+    <label><input type="checkbox" id="ckM" checked> Mythics</label>
+    <label><input type="checkbox" id="ckE" checked> Exotics</label>
+    <label><input type="checkbox" id="ckD" checked> Dev Chests</label>
+    <div class="row"><button id="copyCancel">Cancel</button><button id="copyGo">Copy</button></div>
+  </div>
+</div>
+<script>
+const MYTHICS = [
+["m01","Enhanced Collateral Damage AR"],["m02","Enhanced Holo Twister AR"],["m03","Enhanced Spire Rifle"],["m04","Overclocked Pulse Rifle"],
+["m05","Cerberus' Gatekeeper Shotgun"],["m06","Midas' Gilded Eye Drum Gun"],["m07","Baron's Double Down Pistol"],["m08","The Foundation's MK-Seven Assault Rifle"],
+["m09","Sideways Rifle"],["m10","Kit's Shockwave Launcher"],["m11","The Ageless Champion's Shockwave Hammer"],["m12","Mythic Goldfish"],
+["m13","Enhanced Enforcer AR"],["m14","Emma Frost's Striker Burst AR"],["m15","Sideways Minigun"],
+["m16","O.X.R Rifle"],["m17","Enhanced Sentinel Pump Shotgun"],["m18","Enhanced Wrecker Revolver"],["m19","Oscar's Frenzy Auto Shotgun"],
+["m20","Enhanced Oni Shotgun"],["m21","Valeria's Hyper SMG"],["m22","Enhanced Fury Assault Rifle"],["m23","Midas' Modular Drum Gun"],
+["m24","Ringmaster's Boom Bolt"],["m25","Vector 7 DMR"],["m26","Night Rose Veiled Precision SMG"],["m27","Ares' Warforged Assault Rifle"],
+["m28","Sideways Scythe"],["m29","Hades' Harbringer SMG"],["m30","Conductor's Hand Cannon"],
+["m31","The Foundation's Power Gloves"],["m32","Brute Nemesis AR"],["m33","Enhanced Havoc Pump Shotgun"],["m34","Pinpoint Iron Pump Shotgun"],
+["m35","Jules' Glider Gun"],["m36","Bigfoot's Flex SMG"],["m37","Overdrive Tactical Pistol"],["m38","Enhanced Surgefire SMG"],
+["m39","Skye's Assault Rifle"],["m40","Meowscle's Peow Peow Rifle"],["m41","Brutus' Minigun"],["m42","Midas' Drum Gun (OG)"],
+["m43","Skye's Grappler"],["m44","Enhanced Twinfire Auto Shotgun"],["m45","Two-Shot Shotgun"],
+["m46","The Ageless Champion's Ex-Caliber Rifle"],["m47","Megalo Don's Modular Combat Shotgun"],["m48","Precision Airstrike"]
+];
+const EXOTICS = [
+["e01","Heisted Explosive Assault Rifle"],["e02","Heisted Accelerant Shotgun"],["e03","Boom Sniper Rifle"],["e04","Lawless Accelerant Holo Twister AR"],
+["e05","Lawless Trinity Assault Rifle"],["e06","Lawless Twinfire Slap Shotgun"],["e07","Lawless Heavy Impact Tracking Sniper"],["e08","Lawless Stink Rifle"],
+["e09","Lawless Explosive Mammoth Pistol"],["e10","Lawless Shockwave Rocket Launcher"],["e11","Lawless Slap Cannon"],["e12","Lawless Slap Jug"],
+["e13","Slapberry Fizz"],["e14","The Foundation's Rift Rifle"],["e15","Spicy Slapperoni Slice"],
+["e16","Unstable Frostfire Shotgun"],["e17","Unstable Yoink Shotgun"],["e18","Unstable Voltage Burst Pistol"],["e19","Unstable Thunderclap DMR"],
+["e20","Eradicator Hop Rock Fury Assault Rifle"],["e21","Eradicator O.X.R. Rifle"],["e22","Double Trouble (L)"],["e23","Double Trouble (R)"],
+["e24","Eradicator Wrecker Revolver"],["e25","Eradicator Shadow Precision SMG"],["e26","Eradicator Shock N' Slow Shockwave Launcher"],["e27","Kado Thorne's Deadeye Assault Rifle"],
+["e28","Kado Thorne's Gatekeeper Shotgun"],["e29","Kado Thorne's Monarch Pistol"],["e30","Kado Thorne's Twin Siphon Shotgun"],
+["e31","Venomous Dual Fiend Hunters"]
+];
+const DEVCHESTS = [
+["d01","Explosive Dev Chest"],["d02","Chapter 2 Dev Chest"],["d03","Pizza Dev Chest"],
+["d04","Deagle Dev Chest"],["d05","MK Dev Chest"],["d06","Chapter 5 Dev Chest"],
+["d07","Unstable Dev Chest"],["d08","Lawless Dev Chest"],["d09","Boom Dev Chest"],["d10","Eradicator Dev Chest"]
+];
+const ALL = MYTHICS.concat(EXOTICS, DEVCHESTS);
+const WEAPONS = MYTHICS.concat(EXOTICS);
+const DEVICONS = {
+  d01: "cell-m24.png", d02: "cell-m42.png", d03: "cell-e15.png", d04: "cell-m30.png", d05: "cell-m08.png",
+  d06: "cell-m19.png", d07: "cell-e18.png", d08: "cell-e04.png", d09: "cell-e10.png", d10: "cell-e24.png"
+};
+const LS = "reload-tracker-v1";
+const NAMES = {};
+let state = {got:{}, labels:{}};
+try { state = Object.assign(state, JSON.parse(localStorage.getItem(LS) || "{}")); } catch(e) {}
+function save(){ localStorage.setItem(LS, JSON.stringify(state)); }
+function initials(name){
+  const w = name.replace(/['’]/g,"").split(/[^A-Za-z0-9]+/).filter(Boolean);
+  if (w.length === 1) return w[0].slice(0,2).toUpperCase();
+  return (w[0][0] + (w[1][0] || "")).toUpperCase();
+}
+function build(gridId, items){
+  const grid = document.getElementById(gridId);
+  items.forEach(([id, defName, low]) => {
+    NAMES[id] = defName;
+    const name = state.labels[id] || defName;
+    const cell = document.createElement("div");
+    cell.className = "cell" + (state.got[id] ? " got" : "");
+    cell.dataset.id = id; cell.dataset.name = name.toLowerCase();
+    const tile = document.createElement("div");
+    tile.className = "tile"; tile.title = name;
+    const im = document.createElement("img");
+    im.src = "icons/" + (DEVICONS[id] || ("cell-" + id + ".png")); im.alt = name; im.loading = "lazy";
+    im.onerror = () => { im.remove(); tile.textContent = initials(name); };
+    tile.appendChild(im);
+    const nm = document.createElement("div");
+    nm.className = "name";
+    nm.textContent = name;
+    nm.title = "Double-click to edit label";
+    nm.addEventListener("dblclick", ev => {
+      ev.stopPropagation();
+      const cur = state.labels[id] || defName;
+      const v = prompt("Label for " + id + ":", cur);
+      if (v && v.trim()) {
+        const newName = v.trim();
+        state.labels[id] = newName;
+        nm.textContent = newName;
+        cell.dataset.name = newName.toLowerCase();
+        tile.title = newName;
+
+        const img = tile.querySelector("img");
+        if (img) {
+          img.alt = newName;
+        } else {
+          tile.textContent = initials(newName);
+        }
+        save();
+      }
+    });
+    cell.appendChild(tile); cell.appendChild(nm);
+    cell.addEventListener("click", () => {
+      state.got[id] = !state.got[id];
+      cell.classList.toggle("got", !!state.got[id]);
+      save(); update();
+    });
+    grid.appendChild(cell);
+  });
+}
+function update(){
+  const mGot = MYTHICS.filter(([id]) => state.got[id]).length;
+  const eGot = EXOTICS.filter(([id]) => state.got[id]).length;
+  const dGot = DEVCHESTS.filter(([id]) => state.got[id]).length;
+  const wGot = mGot + eGot;
+  const pc = (n, d) => " (" + Math.round(n / d * 100) + "%)";
+  document.getElementById("mProg").textContent = mGot + " / " + MYTHICS.length + pc(mGot, MYTHICS.length);
+  document.getElementById("eProg").textContent = eGot + " / " + EXOTICS.length + pc(eGot, EXOTICS.length);
+  document.getElementById("dProg").textContent = dGot + " / " + DEVCHESTS.length + pc(dGot, DEVCHESTS.length);
+  document.getElementById("totalProg").innerHTML =
+    "<b>Weapons: " + wGot + " / " + WEAPONS.length + pc(wGot, WEAPONS.length) + "</b>";
+  document.getElementById("totalBar").style.width = (wGot / WEAPONS.length * 100) + "%";
+  document.getElementById("mythicBar").style.width = (mGot / MYTHICS.length * 100) + "%";
+  document.getElementById("exoticBar").style.width = (eGot / EXOTICS.length * 100) + "%";
+  document.getElementById("devBar").style.width = (dGot / DEVCHESTS.length * 100) + "%";
+  const hide = document.getElementById("hideGot").checked;
+  const q = document.getElementById("search").value.trim().toLowerCase();
+  document.querySelectorAll(".cell").forEach(c => {
+    const matchQ = !q || c.dataset.name.includes(q);
+    const matchH = !hide || !state.got[c.dataset.id];
+    c.classList.toggle("hidden", !(matchQ && matchH));
+  });
+}
+build("mythicGrid", MYTHICS);
+build("exoticGrid", EXOTICS);
+build("devGrid", DEVCHESTS);
+document.getElementById("search").addEventListener("input", update);
+document.getElementById("hideGot").addEventListener("change", update);
+document.getElementById("reset").addEventListener("click", () => {
+  if (!confirm("Clear all obtained marks? (Custom labels are kept)")) return;
+  state.got = {}; save();
+  document.querySelectorAll(".cell.got").forEach(c => c.classList.remove("got"));
+  update();
+});
+document.getElementById("export").addEventListener("click", () => {
+  const data = JSON.stringify({ app: "reload-tracker", version: 1, savedAt: new Date().toISOString(), state }, null, 1);
+  const blob = new Blob([data], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "reload-tracker-progress.json";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+document.getElementById("import").addEventListener("click", () => {
+  document.getElementById("importFile").click();
+});
+document.getElementById("importFile").addEventListener("change", (ev) => {
+  const f = ev.target.files && ev.target.files[0];
+  ev.target.value = "";
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const data = JSON.parse(r.result);
+      const s = data && data.state ? data.state : data;
+      if (!s || typeof s !== "object" || !s.got) throw new Error("bad file");
+      state.got = s.got || {};
+      state.labels = s.labels || {};
+      save();
+      document.querySelectorAll(".cell").forEach(c => {
+        const id = c.dataset.id;
+        c.classList.toggle("got", !!state.got[id]);
+        const label = state.labels[id] || NAMES[id] || id;
+        const nm = c.querySelector(".name");
+
+        if (nm) {
+          nm.textContent = label;
+        }
+
+        c.dataset.name = label.toLowerCase();
+
+        const tile = c.querySelector(".tile");
+
+        if (tile) {
+          tile.title = label;
+
+          const img = tile.querySelector("img");
+
+          if (img) {
+            img.alt = label;
+          } else {
+            tile.textContent = initials(label);
+          }
+        }
+      });
+      update();
+    } catch (e) {
+      alert("Could not import that file — is it a reload-tracker-progress.json backup?");
+    }
+  };
+
+  r.readAsText(f);
+});
+let copyMode = "missing";
+
+function openCopyModal(mode) {
+  copyMode = mode;
+  document.getElementById("ckM").checked = true;
+  document.getElementById("ckE").checked = true;
+  document.getElementById("ckD").checked = true;
+
+  document.getElementById("copyTitle").textContent =
+    mode === "got" ? "Copy obtained" : "Copy missing";
+
+  document.getElementById("copyModal").classList.remove("hidden");
+}
+
+function copyList(mode) {
+  const inc = {
+    m: document.getElementById("ckM").checked,
+    e: document.getElementById("ckE").checked,
+    d: document.getElementById("ckD").checked
+  };
+  if (!inc.m && !inc.e && !inc.d) { alert("Select at least one section."); return; }
+  const label = id => state.labels[id] || NAMES[id] || id;
+  const sec = (title, items) => {
+    const list = items.filter(([id]) => mode === "got" ? state.got[id] : !state.got[id]);
+    if (!list.length) return "";
+    return title + " (" + list.length + "):\n" + list.map(([id]) => "- " + label(id)).join("\n") + "\n";
+  };
+  const m = inc.m ? sec("Mythics", MYTHICS) : "", e = inc.e ? sec("Exotics", EXOTICS) : "", d = inc.d ? sec("Dev Chests", DEVCHESTS) : "";
+  const pool = (inc.m ? MYTHICS : []).concat(inc.e ? EXOTICS : [], inc.d ? DEVCHESTS : []);
+  const count = pool.filter(([id]) => mode === "got" ? state.got[id] : !state.got[id]).length;
+  const categories = [
+    inc.m && "Mythics",
+    inc.e && "Exotics",
+    inc.d && "Dev Chests"
+  ].filter(Boolean);
+
+  const text = (
+    "Reload Collection [" + categories.join(" + ") + "] — " +
+    (mode === "got" ? "Obtained " : "Missing ") +
+    count + " / " + pool.length + "\n" + m + e + d
+  ).trim();
+  const done = () => alert("Copied " + count + " " + mode + " item" + (count === 1 ? "" : "s") + " to clipboard.");
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+  } else fallbackCopy(text, done);
+}
+
+function fallbackCopy(text, done) {
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select();
+  try {
+    const copied = document.execCommand("copy");
+    if (copied) done();
+    else alert("Copy failed — your browser blocked it.");
+  } catch (e) {
+    alert("Copy failed — your browser blocked it.");
+  }
+  ta.remove();
+}
+document.getElementById("copyMissing").addEventListener("click", () => openCopyModal("missing"));
+document.getElementById("copyGot").addEventListener("click", () => openCopyModal("got"));
+document.getElementById("copyCancel").addEventListener("click", () => document.getElementById("copyModal").classList.add("hidden"));
+document.getElementById("copyGo").addEventListener("click", () => {
+  document.getElementById("copyModal").classList.add("hidden");
+  copyList(copyMode);
+});
+document.getElementById("copyModal").addEventListener("click", (ev) => {
+  if (ev.target && ev.target.id === "copyModal") ev.target.classList.add("hidden");
+});
+document.addEventListener("keydown", ev => {
+  if (ev.key === "Escape") {
+    document.getElementById("copyModal").classList.add("hidden");
+  }
+});
+update();
+</script>
+</body>
+</html>
