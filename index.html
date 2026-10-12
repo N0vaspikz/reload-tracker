@@ -12,9 +12,22 @@
   body { background: var(--bg); color: #eee; font-family: Segoe UI, Arial, sans-serif; margin: 0; padding: 16px; }
   h1 { font-size: 20px; margin: 0 0 4px; }
   .sub { color: #9aa4b2; font-size: 12px; margin-bottom: 12px; }
-  .toolbar { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-bottom: 12px; }
-  .toolbar > button { width: min(100%, 260px); text-align: left; }
+  .toolbar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; align-items: center; }
+  .toolbar > button { width: 100%; min-width: 0; min-height: 34px; text-align: center; overflow-wrap: anywhere; }
   .toolbar input[type=text] { max-width: 100%; }
+  .toolbar > input[type=text], .toolbar > .progress { grid-column: 1 / -1; }
+  .toolbar label.hide { grid-column: 1 / -1; }
+  .toolbar select { min-width: 0; width: 100%; background: #0f1319; border: 1px solid #333c49; color: #eee; padding: 7px 8px; border-radius: 6px; }
+  .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
+  .stat { background: var(--card); border: 1px solid #333c49; border-radius: 8px; padding: 10px; min-width: 0; }
+  .stat-label { color: #9aa4b2; font-size: 11px; }
+  .stat-value { font-size: 18px; font-weight: 700; margin-top: 4px; overflow-wrap: anywhere; }
+  .milestone { margin: 14px 0 18px; background: var(--card); border: 1px solid #333c49; border-radius: 8px; padding: 12px; }
+  .milestone-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; font-size: 13px; }
+  .milestone-track { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; margin-top: 10px; }
+  .milestone-step { text-align: center; border-radius: 5px; padding: 7px 2px; font-size: 10px; color: #9aa4b2; background: #0f1319; border: 1px solid #333c49; }
+  .milestone-step.done { color: #7ed6a5; border-color: #7ed6a5; background: #193027; }
+  @media (max-width: 520px) { body { padding: 10px; } .toolbar { gap: 6px; } .toolbar > button { padding: 7px 4px; font-size: 11px; } .stats { gap: 5px; } .stat { padding: 7px; } .stat-value { font-size: 15px; } }
   .toolbar input[type=text] { background: #0f1319; border: 1px solid #333c49; color: #eee; padding: 6px 10px; border-radius: 6px; width: 220px; }
   button { background: #2b3542; color: #eee; border: 1px solid #3d4a5c; border-radius: 6px; padding: 6px 12px; cursor: pointer; }
   button:hover { background: #374354; }
@@ -122,7 +135,9 @@
   <button id="export">Export progress</button>
   <button id="import">Import progress</button>
   <button id="historyBtn">Collection history</button>
+  <select id="huntCategory" aria-label="Random hunt category" title="Choose which category to hunt"><option value="all">Hunt: All items</option><option value="mythic">Hunt: Mythics</option><option value="exotic">Hunt: Exotics</option><option value="dev">Hunt: Dev Chests</option></select>
   <button id="huntBtn">🎯 Random missing</button>
+  <button id="statsBtn">📊 Collection stats</button>
   <button id="undoBtn">↶ Undo last change</button>
   <button id="copyMissing">Copy missing</button>
   <button id="copyGot">Copy obtained</button>
@@ -132,6 +147,16 @@
 </div>
 
 <div class="bar"><div id="totalBar" style="background:linear-gradient(90deg,var(--mythic),var(--exotic))"></div></div>
+<div class="stats" aria-live="polite">
+  <div class="stat"><div class="stat-label">Catalogue collected</div><div class="stat-value" id="statCollected">—</div></div>
+  <div class="stat"><div class="stat-label">Still missing</div><div class="stat-value" id="statMissing">—</div></div>
+  <div class="stat"><div class="stat-label">Logged changes</div><div class="stat-value" id="statChanges">—</div></div>
+</div>
+<div class="milestone">
+  <div class="milestone-head"><strong>🏆 Collection milestones</strong><span id="milestoneNext">Loading milestones…</span></div>
+  <div class="bar" style="margin:10px 0 0"><div id="milestoneBar" style="background:#7ed6a5"></div></div>
+  <div class="milestone-track" id="milestoneTrack"></div>
+</div>
 
 <h2><span class="dot" style="background:var(--mythic)"></span> MYTHICS <span id="mProg" style="color:#9aa4b2;font-weight:400"></span></h2>
 <div class="bar"><div id="mythicBar" style="background:var(--mythic)"></div></div>
@@ -166,6 +191,14 @@
     <p class="hint">The publisher needs to be deployed once and configured with GitHub and admin secrets. The admin password is requested only when publishing and is not saved in the page.</p>
     <div class="row"><button id="mgrDownload">Download items.json</button><button id="mgrPublish">Publish to GitHub</button><button id="mgrClose">Close</button></div>
     <div class="manager-status" id="mgrStatus" role="status"></div>
+  </div>
+</div>
+<div class="modal-bg hidden" id="statsModal">
+  <div class="modal manager">
+    <h3>Collection statistics</h3>
+    <p class="hint">Live stats based on your current catalogue and this browser’s saved collection.</p>
+    <div id="statsDetails"></div>
+    <div class="row"><button id="statsClose">Close</button></div>
   </div>
 </div>
 <div class="modal-bg hidden" id="historyModal">
@@ -256,6 +289,45 @@ function build(gridId, items){
     grid.appendChild(cell);
   });
 }
+const MILESTONES = [25, 50, 75, 90, 100];
+function updateStats(){
+  const total = ALL.length;
+  const got = ALL.filter(([id]) => !!state.got[id]).length;
+  const missing = total - got;
+  const pct = total ? Math.round(got / total * 100) : 0;
+  document.getElementById("statCollected").textContent = got + " / " + total + " (" + pct + "%)";
+  document.getElementById("statMissing").textContent = missing;
+  document.getElementById("statChanges").textContent = Array.isArray(state.history) ? state.history.length : 0;
+  const next = MILESTONES.find(mark => pct < mark);
+  document.getElementById("milestoneNext").textContent = next ? (next - pct) + "% to " + next + "% milestone" : "All milestones complete!";
+  document.getElementById("milestoneBar").style.width = pct + "%";
+  const track = document.getElementById("milestoneTrack");
+  track.innerHTML = "";
+  MILESTONES.forEach(mark => {
+    const step = document.createElement("div");
+    step.className = "milestone-step" + (pct >= mark ? " done" : "");
+    step.textContent = (pct >= mark ? "✓ " : "") + mark + "%";
+    track.appendChild(step);
+  });
+  const detail = document.getElementById("statsDetails");
+  if (detail) {
+    detail.innerHTML = "";
+    const rows = [
+      ["All catalogue", got, total],
+      ["Mythics", MYTHICS.filter(([id]) => state.got[id]).length, MYTHICS.length],
+      ["Exotics", EXOTICS.filter(([id]) => state.got[id]).length, EXOTICS.length],
+      ["Dev Chests", DEVCHESTS.filter(([id]) => state.got[id]).length, DEVCHESTS.length],
+      ["Weapons only", WEAPONS.filter(([id]) => state.got[id]).length, WEAPONS.length]
+    ];
+    rows.forEach(([label, count, max]) => {
+      const row = document.createElement("div");
+      row.style.cssText = "display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid #333c49;font-size:13px";
+      const name = document.createElement("span"); name.textContent = label;
+      const value = document.createElement("strong"); value.textContent = count + " / " + max + " (" + (max ? Math.round(count / max * 100) : 0) + "%)";
+      row.append(name, value); detail.appendChild(row);
+    });
+  }
+}
 function update(){
   const mGot = MYTHICS.filter(([id]) => state.got[id]).length;
   const eGot = EXOTICS.filter(([id]) => state.got[id]).length;
@@ -271,6 +343,8 @@ function update(){
   document.getElementById("mythicBar").style.width = (mGot / MYTHICS.length * 100) + "%";
   document.getElementById("exoticBar").style.width = (eGot / EXOTICS.length * 100) + "%";
   document.getElementById("devBar").style.width = (dGot / DEVCHESTS.length * 100) + "%";
+  updateStats();
+  updateStats();
   const hide = document.getElementById("hideGot").checked;
   const q = document.getElementById("search").value.trim().toLowerCase();
   document.querySelectorAll(".cell").forEach(c => {
@@ -331,9 +405,11 @@ document.getElementById("undoBtn").addEventListener("click", () => {
   update();
 });
 document.getElementById("huntBtn").addEventListener("click", () => {
-  const missing = ALL.filter(([id]) => !state.got[id]);
+  const category = document.getElementById("huntCategory").value;
+  const pool = category === "all" ? ALL : category === "mythic" ? MYTHICS : category === "exotic" ? EXOTICS : DEVCHESTS;
+  const missing = pool.filter(([id]) => !state.got[id]);
   if (!missing.length) {
-    alert("You have collected every item in the catalogue. Absolute menace. 🏆");
+    alert("No missing items left in " + (category === "all" ? "the catalogue" : category === "dev" ? "Dev Chests" : category + "s") + ". Pick another hunt category or enjoy the 100%. 🏆");
     return;
   }
   const [id] = missing[Math.floor(Math.random() * missing.length)];
@@ -500,6 +576,14 @@ function renderHistory(){
     list.appendChild(row);
   });
 }
+document.getElementById("statsBtn").addEventListener("click", () => {
+  updateStats();
+  document.getElementById("statsModal").classList.remove("hidden");
+});
+document.getElementById("statsClose").addEventListener("click", () => document.getElementById("statsModal").classList.add("hidden"));
+document.getElementById("statsModal").addEventListener("click", ev => {
+  if (ev.target.id === "statsModal") ev.currentTarget.classList.add("hidden");
+});
 document.getElementById("historyBtn").addEventListener("click", () => {
   renderHistory();
   document.getElementById("historyModal").classList.remove("hidden");
@@ -529,6 +613,7 @@ document.addEventListener("keydown", ev => {
     document.getElementById("copyModal").classList.add("hidden");
     document.getElementById("historyModal").classList.add("hidden");
     document.getElementById("managerModal").classList.add("hidden");
+    document.getElementById("statsModal").classList.add("hidden");
   }
 });
 
