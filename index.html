@@ -116,6 +116,7 @@
   <button id="reset">Reset all</button>
   <button id="export">Export progress</button>
   <button id="import">Import progress</button>
+  <button id="historyBtn">Collection history</button>
   <button id="copyMissing">Copy missing</button>
   <button id="copyGot">Copy obtained</button>
   <input type="file" id="importFile" accept="application/json" style="display:none">
@@ -160,6 +161,14 @@
     <div class="manager-status" id="mgrStatus" role="status"></div>
   </div>
 </div>
+<div class="modal-bg hidden" id="historyModal">
+  <div class="modal manager">
+    <h3>Collection history</h3>
+    <p class="hint">Recent obtained/unobtained changes on this browser. History is included in progress backups.</p>
+    <div class="row"><button id="historyClear">Clear history</button><button id="historyClose">Close</button></div>
+    <div id="historyList" style="margin-top:12px;max-height:55vh;overflow:auto"></div>
+  </div>
+</div>
 <div class="modal-bg hidden" id="copyModal">
   <div class="modal">
     <h3 id="copyTitle">Copy</h3>
@@ -181,7 +190,8 @@ const DEVICONS = {
 };
 const LS = "reload-tracker-v1";
 const NAMES = {};
-let state = {got:{}, labels:{}};
+let state = {got:{}, labels:{}, history:[]};
+if (!Array.isArray(state.history)) state.history = [];
 try { state = Object.assign(state, JSON.parse(localStorage.getItem(LS) || "{}")); } catch(e) {}
 function save(){ localStorage.setItem(LS, JSON.stringify(state)); }
 function initials(name){
@@ -230,6 +240,9 @@ function build(gridId, items){
     cell.appendChild(tile); cell.appendChild(nm);
     cell.addEventListener("click", () => {
       state.got[id] = !state.got[id];
+      state.history = Array.isArray(state.history) ? state.history : [];
+      state.history.unshift({id, name: state.labels[id] || defName, obtained: !!state.got[id], at: new Date().toISOString()});
+      state.history = state.history.slice(0, 100);
       cell.classList.toggle("got", !!state.got[id]);
       save(); update();
     });
@@ -325,6 +338,7 @@ document.getElementById("importFile").addEventListener("change", (ev) => {
       if (!s || typeof s !== "object" || !s.got) throw new Error("bad file");
       state.got = s.got || {};
       state.labels = s.labels || {};
+      state.history = Array.isArray(s.history) ? s.history.slice(0, 100) : [];
       save();
       document.querySelectorAll(".cell").forEach(c => {
         const id = c.dataset.id;
@@ -420,6 +434,45 @@ function fallbackCopy(text, done) {
   }
   ta.remove();
 }
+function renderHistory(){
+  const list = document.getElementById("historyList");
+  const history = Array.isArray(state.history) ? state.history : [];
+  if (!history.length) {
+    list.innerHTML = '<p class="hint">No collection changes recorded yet. Click an item to mark it obtained or unobtained.</p>';
+    return;
+  }
+  list.innerHTML = "";
+  history.forEach(entry => {
+    const row = document.createElement("div");
+    row.style.cssText = "padding:9px 0;border-bottom:1px solid #333c49;font-size:13px";
+    const status = document.createElement("strong");
+    status.textContent = entry.obtained ? "✓ Obtained" : "↩ Marked missing";
+    status.style.color = entry.obtained ? "#7ed6a5" : "#e0a63c";
+    const name = document.createElement("div");
+    name.textContent = entry.name || entry.id || "Unknown item";
+    name.style.marginTop = "3px";
+    const date = document.createElement("div");
+    date.className = "hint";
+    const parsed = new Date(entry.at);
+    date.textContent = Number.isNaN(parsed.getTime()) ? "" : parsed.toLocaleString();
+    row.append(status, name, date);
+    list.appendChild(row);
+  });
+}
+document.getElementById("historyBtn").addEventListener("click", () => {
+  renderHistory();
+  document.getElementById("historyModal").classList.remove("hidden");
+});
+document.getElementById("historyClose").addEventListener("click", () => document.getElementById("historyModal").classList.add("hidden"));
+document.getElementById("historyClear").addEventListener("click", () => {
+  if (!confirm("Clear the collection history? Your obtained marks will not change.")) return;
+  state.history = [];
+  save();
+  renderHistory();
+});
+document.getElementById("historyModal").addEventListener("click", ev => {
+  if (ev.target.id === "historyModal") ev.currentTarget.classList.add("hidden");
+});
 document.getElementById("copyMissing").addEventListener("click", () => openCopyModal("missing"));
 document.getElementById("copyGot").addEventListener("click", () => openCopyModal("got"));
 document.getElementById("copyCancel").addEventListener("click", () => document.getElementById("copyModal").classList.add("hidden"));
@@ -433,6 +486,8 @@ document.getElementById("copyModal").addEventListener("click", (ev) => {
 document.addEventListener("keydown", ev => {
   if (ev.key === "Escape") {
     document.getElementById("copyModal").classList.add("hidden");
+    document.getElementById("historyModal").classList.add("hidden");
+    document.getElementById("managerModal").classList.add("hidden");
   }
 });
 
