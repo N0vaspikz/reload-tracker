@@ -12,16 +12,86 @@
   body { background: var(--bg); color: #eee; font-family: Segoe UI, Arial, sans-serif; margin: 0; padding: 16px; }
   h1 { font-size: 20px; margin: 0 0 4px; }
   .sub { color: #9aa4b2; font-size: 12px; margin-bottom: 12px; }
-  .toolbar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 14px; align-items: stretch; }
-  .toolbar > button { width: 100%; min-width: 0; min-height: 38px; text-align: center; overflow-wrap: anywhere; padding: 8px 10px; }
-  .toolbar input[type=text] { max-width: 100%; }
-  .toolbar > input[type=text] { grid-column: span 3; width: 100%; min-height: 38px; }
-  .toolbar > .progress { grid-column: 1 / -1; }
-  .toolbar label.hide { grid-column: span 1; justify-content: center; padding: 8px; background: #1e242e; border: 1px solid #333c49; border-radius: 6px; min-width: 0; }
-  .toolbar select { min-width: 0; width: 100%; background: #0f1319; border: 1px solid #333c49; color: #eee; padding: 7px 8px; border-radius: 6px; }
-  .hunt-controls { grid-column: span 2; display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 8px; min-width: 0; }
-  .hunt-controls select, .hunt-controls button { width: 100%; min-width: 0; min-height: 38px; }
-  .hunt-controls button { padding-left: 6px; padding-right: 6px; }
+  .toolbar {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 9px;
+    margin: 0 0 16px;
+    padding: 14px;
+    align-items: center;
+    background: linear-gradient(145deg, #1b222d, #171d26);
+    border: 1px solid #303b4a;
+    border-radius: 14px;
+    box-shadow: 0 8px 24px #00000020;
+  }
+  .toolbar > * { min-width: 0; }
+  .toolbar > input[type=text] {
+    grid-column: span 2;
+    width: 100%;
+    max-width: none;
+    min-height: 40px;
+    padding: 9px 12px;
+    background: #10151d;
+    border: 1px solid #3a4657;
+    border-radius: 9px;
+    color: #f4f6fa;
+    outline: none;
+  }
+  .toolbar > input[type=text]:focus {
+    border-color: #6e9dd8;
+    box-shadow: 0 0 0 3px #6e9dd822;
+  }
+  .toolbar label.hide {
+    grid-column: span 2;
+    justify-content: flex-start;
+    gap: 9px;
+    min-height: 40px;
+    padding: 0 12px;
+    background: #10151d;
+    border: 1px solid #303b4a;
+    border-radius: 9px;
+    color: #c2cbd7;
+  }
+  .toolbar label.hide input { accent-color: #7ed6a5; width: 15px; height: 15px; margin: 0; }
+  .toolbar > button, .hunt-controls button {
+    width: 100%;
+    min-width: 0;
+    min-height: 40px;
+    padding: 9px 10px;
+    border: 1px solid #354356;
+    border-radius: 9px;
+    background: #252f3d;
+    color: #e8edf5;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: normal;
+    transition: background .15s, border-color .15s, transform .15s;
+  }
+  .toolbar > button:hover, .hunt-controls button:hover {
+    background: #334256;
+    border-color: #536984;
+    transform: translateY(-1px);
+  }
+  .toolbar > .progress { grid-column: 1 / -1; padding: 3px 2px 0; }
+  .toolbar select {
+    width: 100%;
+    min-width: 0;
+    min-height: 40px;
+    padding: 8px 10px;
+    border: 1px solid #354356;
+    border-radius: 9px;
+    background: #10151d;
+    color: #e8edf5;
+  }
+  .hunt-controls {
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
+    gap: 9px;
+    min-width: 0;
+  }
+  .hunt-controls select, .hunt-controls button { width: 100%; min-width: 0; }
+  .hunt-controls button { padding-left: 8px; padding-right: 8px; }
   .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
   .stat { background: var(--card); border: 1px solid #333c49; border-radius: 8px; padding: 10px; min-width: 0; }
   .stat-label { color: #9aa4b2; font-size: 11px; }
@@ -31,8 +101,21 @@
   .milestone-track { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; margin-top: 10px; }
   .milestone-step { text-align: center; border-radius: 5px; padding: 7px 2px; font-size: 10px; color: #9aa4b2; background: #0f1319; border: 1px solid #333c49; }
   .milestone-step.done { color: #7ed6a5; border-color: #7ed6a5; background: #193027; }
-  @media (max-width: 520px) { body { padding: 10px; } .toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; } .toolbar > input[type=text] { grid-column: 1 / -1; } .toolbar label.hide { grid-column: 1 / -1; justify-content: flex-start; } .toolbar > button { padding: 8px 5px; font-size: 11px; } .hunt-controls { grid-column: 1 / -1; } .hunt-controls button { font-size: 12px; } .stats { gap: 5px; } .stat { padding: 7px; } .stat-value { font-size: 15px; } }
-  .toolbar input[type=text] { background: #0f1319; border: 1px solid #333c49; color: #eee; padding: 6px 10px; border-radius: 6px; width: 220px; }
+  @media (max-width: 700px) {
+    body { padding: 10px; }
+    .toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; padding: 10px; border-radius: 11px; }
+    .toolbar > input[type=text] { grid-column: 1 / -1; }
+    .toolbar label.hide { grid-column: 1 / -1; }
+    .toolbar > button { padding: 9px 7px; font-size: 11px; }
+    .hunt-controls { grid-column: 1 / -1; }
+    .hunt-controls button { font-size: 12px; }
+    .stats { gap: 5px; }
+    .stat { padding: 7px; }
+    .stat-value { font-size: 15px; }
+  }
+  @media (min-width: 701px) {
+    .toolbar > #manageItems { grid-column: span 1; }
+  }
   button { background: #2b3542; color: #eee; border: 1px solid #3d4a5c; border-radius: 6px; padding: 6px 12px; cursor: pointer; }
   button:hover { background: #374354; }
   label.hide { font-size: 13px; color: #9aa4b2; display: flex; gap: 6px; align-items: center; }
