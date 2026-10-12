@@ -95,6 +95,16 @@
   .modal h3 { margin: 0 0 8px; font-size: 15px; }
   .modal label { display: flex; gap: 8px; align-items: center; font-size: 14px; margin: 10px 0; cursor: pointer; }
   .modal .row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }
+  .manager { width: min(760px, calc(100vw - 28px)); max-height: 88vh; overflow: auto; }
+  .manager-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  .manager input, .manager select { width: 100%; min-width: 0; background: #0f1319; border: 1px solid #3d4a5c; color: #eee; padding: 8px 10px; border-radius: 6px; }
+  .manager label { display: block; margin: 10px 0; }
+  .manager label span { display: block; margin-bottom: 5px; color: #9aa4b2; font-size: 12px; }
+  .manager .hint { color: #9aa4b2; font-size: 12px; line-height: 1.5; }
+  .manager .row { justify-content: flex-start; flex-wrap: wrap; }
+  .manager .row button { flex: 1; }
+  .manager-status { color: #9aa4b2; font-size: 12px; white-space: pre-wrap; margin-top: 10px; }
+  @media (max-width: 560px) { .manager-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -102,6 +112,7 @@
 <div class="toolbar">
   <input type="text" id="search" placeholder="Search weapons...">
   <label class="hide"><input type="checkbox" id="hideGot"> Hide obtained</label>
+  <button id="manageItems">Manage items</button>
   <button id="reset">Reset all</button>
   <button id="export">Export progress</button>
   <button id="import">Import progress</button>
@@ -109,7 +120,7 @@
   <button id="copyGot">Copy obtained</button>
   <input type="file" id="importFile" accept="application/json" style="display:none">
   <br>
-  <span class="progress" id="totalProg">0 / 79 obtained (0%)</span>
+  <span class="progress" id="totalProg">Loading catalogue…</span>
 </div>
 
 <div class="bar"><div id="totalBar" style="background:linear-gradient(90deg,var(--mythic),var(--exotic))"></div></div>
@@ -126,6 +137,29 @@
 <div class="bar"><div id="devBar" style="background:#c778ff"></div></div>
 <div class="grid dev" id="devGrid"></div>
 
+<div class="modal-bg hidden" id="managerModal">
+  <div class="modal manager">
+    <h3>Manage catalogue</h3>
+    <p class="hint">Changes are staged in this browser until you publish them. Existing item IDs are kept stable so collection progress stays attached to the right items.</p>
+    <div class="manager-grid">
+      <div>
+        <label><span>Category</span><select id="mgrCategory"><option value="mythic">Mythic</option><option value="exotic">Exotic</option><option value="dev">Dev Chest</option></select></label>
+        <label><span>Existing item</span><select id="mgrItem"></select></label>
+        <div class="row"><button id="mgrNew">New item</button><button id="mgrDelete">Delete selected</button></div>
+      </div>
+      <div>
+        <label><span>Stable item ID</span><input id="mgrId" readonly></label>
+        <label><span>Display name</span><input id="mgrName" maxlength="100" placeholder="Item name"></label>
+        <label><span>Image filename inside icons/</span><input id="mgrImage" maxlength="120" placeholder="cell-m01.png"></label>
+        <div class="row"><button id="mgrSave">Save item</button></div>
+      </div>
+    </div>
+    <label><span>Cloudflare Worker publisher URL</span><input id="mgrEndpoint" placeholder="https://your-worker.your-subdomain.workers.dev"></label>
+    <p class="hint">The publisher needs to be deployed once and configured with GitHub and admin secrets. The admin password is requested only when publishing and is not saved in the page.</p>
+    <div class="row"><button id="mgrDownload">Download items.json</button><button id="mgrPublish">Publish to GitHub</button><button id="mgrClose">Close</button></div>
+    <div class="manager-status" id="mgrStatus" role="status"></div>
+  </div>
+</div>
 <div class="modal-bg hidden" id="copyModal">
   <div class="modal">
     <h3 id="copyTitle">Copy</h3>
@@ -136,39 +170,11 @@
   </div>
 </div>
 <script>
-const MYTHICS = [
-["m01","Enhanced Collateral Damage AR"],["m02","Enhanced Holo Twister AR"],["m03","Enhanced Spire Rifle"],["m04","Overclocked Pulse Rifle"],
-["m05","Cerberus' Gatekeeper Shotgun"],["m06","Midas' Gilded Eye Drum Gun"],["m07","Baron's Double Down Pistol"],["m08","The Foundation's MK-Seven Assault Rifle"],
-["m09","Sideways Rifle"],["m10","Kit's Shockwave Launcher"],["m11","The Ageless Champion's Shockwave Hammer"],["m12","Mythic Goldfish"],
-["m13","Enhanced Enforcer AR"],["m14","Emma Frost's Striker Burst AR"],["m15","Sideways Minigun"],
-["m16","O.X.R Rifle"],["m17","Enhanced Sentinel Pump Shotgun"],["m18","Enhanced Wrecker Revolver"],["m19","Oscar's Frenzy Auto Shotgun"],
-["m20","Enhanced Oni Shotgun"],["m21","Valeria's Hyper SMG"],["m22","Enhanced Fury Assault Rifle"],["m23","Midas' Modular Drum Gun"],
-["m24","Ringmaster's Boom Bolt"],["m25","Vector 7 DMR"],["m26","Night Rose Veiled Precision SMG"],["m27","Ares' Warforged Assault Rifle"],
-["m28","Sideways Scythe"],["m29","Hades' Harbringer SMG"],["m30","Conductor's Hand Cannon"],
-["m31","The Foundation's Power Gloves"],["m32","Brute Nemesis AR"],["m33","Enhanced Havoc Pump Shotgun"],["m34","Pinpoint Iron Pump Shotgun"],
-["m35","Jules' Glider Gun"],["m36","Bigfoot's Flex SMG"],["m37","Overdrive Tactical Pistol"],["m38","Enhanced Surgefire SMG"],
-["m39","Skye's Assault Rifle"],["m40","Meowscle's Peow Peow Rifle"],["m41","Brutus' Minigun"],["m42","Midas' Drum Gun (OG)"],
-["m43","Skye's Grappler"],["m44","Enhanced Twinfire Auto Shotgun"],["m45","Two-Shot Shotgun"],
-["m46","The Ageless Champion's Ex-Caliber Rifle"],["m47","Megalo Don's Modular Combat Shotgun"],["m48","Precision Airstrike"]
-];
-const EXOTICS = [
-["e01","Heisted Explosive Assault Rifle"],["e02","Heisted Accelerant Shotgun"],["e03","Boom Sniper Rifle"],["e04","Lawless Accelerant Holo Twister AR"],
-["e05","Lawless Trinity Assault Rifle"],["e06","Lawless Twinfire Slap Shotgun"],["e07","Lawless Heavy Impact Tracking Sniper"],["e08","Lawless Stink Rifle"],
-["e09","Lawless Explosive Mammoth Pistol"],["e10","Lawless Shockwave Rocket Launcher"],["e11","Lawless Slap Cannon"],["e12","Lawless Slap Jug"],
-["e13","Slapberry Fizz"],["e14","The Foundation's Rift Rifle"],["e15","Spicy Slapperoni Slice"],
-["e16","Unstable Frostfire Shotgun"],["e17","Unstable Yoink Shotgun"],["e18","Unstable Voltage Burst Pistol"],["e19","Unstable Thunderclap DMR"],
-["e20","Eradicator Hop Rock Fury Assault Rifle"],["e21","Eradicator O.X.R. Rifle"],["e22","Double Trouble (L)"],["e23","Double Trouble (R)"],
-["e24","Eradicator Wrecker Revolver"],["e25","Eradicator Shadow Precision SMG"],["e26","Eradicator Shock N' Slow Shockwave Launcher"],["e27","Kado Thorne's Deadeye Assault Rifle"],
-["e28","Kado Thorne's Gatekeeper Shotgun"],["e29","Kado Thorne's Monarch Pistol"],["e30","Kado Thorne's Twin Siphon Shotgun"],
-["e31","Venomous Dual Fiend Hunters"]
-];
-const DEVCHESTS = [
-["d01","Explosive Dev Chest"],["d02","Chapter 2 Dev Chest"],["d03","Pizza Dev Chest"],
-["d04","Deagle Dev Chest"],["d05","MK Dev Chest"],["d06","Chapter 5 Dev Chest"],
-["d07","Unstable Dev Chest"],["d08","Lawless Dev Chest"],["d09","Boom Dev Chest"],["d10","Eradicator Dev Chest"]
-];
-const ALL = MYTHICS.concat(EXOTICS, DEVCHESTS);
-const WEAPONS = MYTHICS.concat(EXOTICS);
+const MYTHICS = [];
+const EXOTICS = [];
+const DEVCHESTS = [];
+let ALL = [];
+let WEAPONS = [];
 const DEVICONS = {
   d01: "cell-m24.png", d02: "cell-m42.png", d03: "cell-e15.png", d04: "cell-m30.png", d05: "cell-m08.png",
   d06: "cell-m19.png", d07: "cell-e18.png", d08: "cell-e04.png", d09: "cell-e10.png", d10: "cell-e24.png"
@@ -194,7 +200,7 @@ function build(gridId, items){
     const tile = document.createElement("div");
     tile.className = "tile"; tile.title = name;
     const im = document.createElement("img");
-    im.src = "icons/" + (DEVICONS[id] || ("cell-" + id + ".png")); im.alt = name; im.loading = "lazy";
+    im.src = "icons/" + (low || ("cell-" + id + ".png")); im.alt = name; im.loading = "lazy";
     im.onerror = () => { im.remove(); tile.textContent = initials(name); };
     tile.appendChild(im);
     const nm = document.createElement("div");
@@ -253,9 +259,40 @@ function update(){
     c.classList.toggle("hidden", !(matchQ && matchH));
   });
 }
-build("mythicGrid", MYTHICS);
-build("exoticGrid", EXOTICS);
-build("devGrid", DEVCHESTS);
+function renderAll(){
+  document.getElementById("mythicGrid").innerHTML = "";
+  document.getElementById("exoticGrid").innerHTML = "";
+  document.getElementById("devGrid").innerHTML = "";
+  Object.keys(NAMES).forEach(k => delete NAMES[k]);
+  build("mythicGrid", MYTHICS);
+  build("exoticGrid", EXOTICS);
+  build("devGrid", DEVCHESTS);
+  update();
+}
+async function loadCatalogue(){
+  const response = await fetch("./items.json", {cache:"no-store"});
+  if (!response.ok) throw new Error("items.json returned HTTP " + response.status);
+  const data = await response.json();
+  if (!data || !Array.isArray(data.items)) throw new Error("items.json has no items array");
+  const ids = new Set();
+  data.items.forEach(item => {
+    if (!item || !/^[med][0-9]{2,}$/.test(item.id) || !["mythic","exotic","dev"].includes(item.category) || typeof item.name !== "string" || typeof item.image !== "string") throw new Error("Invalid catalogue entry");
+    if (ids.has(item.id)) throw new Error("Duplicate item ID: " + item.id);
+    ids.add(item.id);
+    const row = [item.id, item.name, item.image];
+    if (item.category === "mythic") MYTHICS.push(row);
+    else if (item.category === "exotic") EXOTICS.push(row);
+    else DEVCHESTS.push(row);
+  });
+  ALL = MYTHICS.concat(EXOTICS, DEVCHESTS);
+  WEAPONS = MYTHICS.concat(EXOTICS);
+  renderAll();
+  refreshManager();
+}
+loadCatalogue().catch(err => {
+  document.getElementById("totalProg").textContent = "Could not load items.json: " + err.message;
+  console.error(err);
+});
 document.getElementById("search").addEventListener("input", update);
 document.getElementById("hideGot").addEventListener("change", update);
 document.getElementById("reset").addEventListener("click", () => {
@@ -398,6 +435,114 @@ document.addEventListener("keydown", ev => {
     document.getElementById("copyModal").classList.add("hidden");
   }
 });
+
+const CATEGORY_META = {
+  mythic:{items:MYTHICS,prefix:"m"},
+  exotic:{items:EXOTICS,prefix:"e"},
+  dev:{items:DEVCHESTS,prefix:"d"}
+};
+let editingId = null;
+let addingNew = false;
+function categoryFor(id){ return CATEGORY_META[id && id[0] === "m" ? "mythic" : id && id[0] === "e" ? "exotic" : "dev"]; }
+function allRows(){ return MYTHICS.concat(EXOTICS, DEVCHESTS); }
+function catalogueJSON(){ return JSON.stringify({version:1,items:allRows().map(([id,name,image])=>({id,name,category:categoryFor(id).prefix === "m" ? "mythic" : categoryFor(id).prefix === "e" ? "exotic" : "dev",image:image || ("cell-"+id+".png")}))},null,2)+"\n"; }
+function refreshManager(){
+  const cat = document.getElementById("mgrCategory").value;
+  const sel = document.getElementById("mgrItem");
+  const rows = CATEGORY_META[cat].items;
+  sel.innerHTML = "";
+  rows.forEach(([id,name]) => { const op=document.createElement("option"); op.value=id; op.textContent=id+" — "+(state.labels[id]||name); sel.appendChild(op); });
+  if (editingId && rows.some(r=>r[0]===editingId)) sel.value=editingId;
+  loadManagerItem();
+}
+function loadManagerItem(){
+  const id = document.getElementById("mgrItem").value;
+  const cat = document.getElementById("mgrCategory").value;
+  const row = CATEGORY_META[cat].items.find(r=>r[0]===id);
+  addingNew = false;
+  editingId = row ? row[0] : null;
+  document.getElementById("mgrId").value = row ? row[0] : "";
+  document.getElementById("mgrName").value = row ? row[1] : "";
+  document.getElementById("mgrImage").value = row ? (row[2] || "cell-"+row[0]+".png") : "";
+  document.getElementById("mgrDelete").disabled = !row;
+}
+function nextId(prefix){
+  const nums=allRows().map(r=>r[0]).filter(id=>id[0]===prefix).map(id=>Number(id.slice(1))).filter(Number.isFinite);
+  let n=Math.max(0,...nums)+1;
+  let id=prefix+String(n).padStart(2,"0");
+  while(allRows().some(r=>r[0]===id)){n++;id=prefix+String(n).padStart(2,"0");}
+  return id;
+}
+function managerStatus(message){document.getElementById("mgrStatus").textContent=message;}
+document.getElementById("manageItems").addEventListener("click",()=>{
+  document.getElementById("managerModal").classList.remove("hidden");
+  document.getElementById("mgrEndpoint").value=localStorage.getItem("reload-tracker-publisher-url")||"";
+  refreshManager();
+});
+document.getElementById("mgrClose").addEventListener("click",()=>document.getElementById("managerModal").classList.add("hidden"));
+document.getElementById("mgrCategory").addEventListener("change",()=>{editingId=null;refreshManager();});
+document.getElementById("mgrItem").addEventListener("change",loadManagerItem);
+document.getElementById("mgrNew").addEventListener("click",()=>{
+  const cat=document.getElementById("mgrCategory").value;
+  addingNew=true; editingId=null;
+  document.getElementById("mgrId").value=nextId(CATEGORY_META[cat].prefix);
+  document.getElementById("mgrName").value="";
+  document.getElementById("mgrImage").value="cell-"+document.getElementById("mgrId").value+".png";
+  document.getElementById("mgrDelete").disabled=true;
+  document.getElementById("mgrName").focus();
+});
+document.getElementById("mgrSave").addEventListener("click",()=>{
+  const cat=document.getElementById("mgrCategory").value;
+  const id=document.getElementById("mgrId").value.trim();
+  const name=document.getElementById("mgrName").value.trim();
+  const image=document.getElementById("mgrImage").value.trim();
+  if(!name){managerStatus("Enter an item name first.");return;}
+  if(!/^[A-Za-z0-9_-]+\.(png|webp|jpg|jpeg|avif)$/i.test(image)){managerStatus("Image must be a filename such as cell-m49.png (not a path).");return;}
+  const rows=CATEGORY_META[cat].items;
+  if(addingNew){
+    if(allRows().some(r=>r[0]===id)){managerStatus("That ID already exists. Try New item again.");return;}
+    rows.push([id,name,image]);
+    editingId=id;
+  }else{
+    const row=rows.find(r=>r[0]===id);
+    if(!row){managerStatus("Select an item or click New item.");return;}
+    row[1]=name;row[2]=image;
+  }
+  renderAll();refreshManager();document.getElementById("mgrItem").value=id;loadManagerItem();
+  managerStatus("Saved in this session. Publish to GitHub to make the change live.");
+});
+document.getElementById("mgrDelete").addEventListener("click",()=>{
+  const cat=document.getElementById("mgrCategory").value,id=document.getElementById("mgrItem").value;
+  const row=CATEGORY_META[cat].items.find(r=>r[0]===id);
+  if(!row)return;
+  if(!confirm("Delete "+row[1]+" ("+id+") from the catalogue? Its saved progress data will be retained but no longer displayed."))return;
+  const rows=CATEGORY_META[cat].items;rows.splice(rows.findIndex(r=>r[0]===id),1);
+  renderAll();refreshManager();managerStatus("Deleted locally. Publish to GitHub to make the change live.");
+});
+document.getElementById("mgrDownload").addEventListener("click",()=>{
+  const blob=new Blob([catalogueJSON()],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="items.json";a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  managerStatus("Downloaded items.json.");
+});
+document.getElementById("mgrEndpoint").addEventListener("change",ev=>localStorage.setItem("reload-tracker-publisher-url",ev.target.value.trim()));
+document.getElementById("mgrPublish").addEventListener("click",async()=>{
+  const endpoint=document.getElementById("mgrEndpoint").value.trim();
+  if(!endpoint){managerStatus("Add your deployed Cloudflare Worker URL first. See PUBLISHING.md in the repository.");return;}
+  if(!/^https:\/\//i.test(endpoint)){managerStatus("Publisher URL must start with https://");return;}
+  const password=prompt("Enter your publisher admin password. It will not be saved.");
+  if(password===null)return;
+  const btn=document.getElementById("mgrPublish");btn.disabled=true;managerStatus("Publishing catalogue to GitHub…");
+  try{
+    const res=await fetch(endpoint,{method:"POST",headers:{"Content-Type":"application/json","X-Admin-Password":password},body:catalogueJSON()});
+    const result=await res.json().catch(()=>({}));
+    if(!res.ok)throw new Error(result.error||("HTTP "+res.status));
+    managerStatus("Published successfully. GitHub commit: "+(result.commit||"created")+". The live page may take a minute to refresh.");
+  }catch(err){managerStatus("Publish failed: "+err.message+"\nYou can still download items.json as a backup.");}
+  finally{btn.disabled=false;}
+});
+document.getElementById("managerModal").addEventListener("click",ev=>{if(ev.target.id==="managerModal")ev.currentTarget.classList.add("hidden");});
+
 update();
 </script>
 </body>
