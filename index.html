@@ -148,7 +148,9 @@
     user-select: none;
   }
 
-  .cell:hover { transform: scale(1.05); }
+  .cell:hover { transform: scale(1.05); z-index: 2; }
+  .cell:hover .name { font-size: 11px; line-height: 1.2; }
+  .cell:hover .conf { font-size: 9px; }
   .cell.got { opacity: 1; }
 
   .mythic .cell.got { border-color: var(--mythic); box-shadow: 0 0 8px #f5a62366; }
