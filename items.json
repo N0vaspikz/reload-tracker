@@ -290,6 +290,12 @@
       "image": "cell-m48.png"
     },
     {
+      "id": "m49",
+      "name": "Thorne's Vampiric Blade",
+      "category": "mythic",
+      "image": "cell-m49.png"
+    },
+    {
       "id": "e01",
       "name": "Heisted Explosive Assault Rifle",
       "category": "exotic",
