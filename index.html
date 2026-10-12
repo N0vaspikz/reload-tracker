@@ -87,6 +87,9 @@
   .name { font-size: 9.5px; line-height: 1.2; margin-top: 4px; min-height: 23px; color: #cfd6e0; word-break: break-word; }
   .cell .conf { font-size: 8px; color: #e0a63c; }
   .cell.hidden { display: none; }
+  .cell.hunt-target { outline: 3px solid #7ed6a5; outline-offset: 2px; animation: huntPulse .8s ease-in-out 3; }
+  @keyframes huntPulse { 50% { box-shadow: 0 0 18px #7ed6a599; } }
+  @media (prefers-reduced-motion: reduce) { .cell.hunt-target { animation: none; } }
   .foot { color: #9aa4b2; font-size: 11px; margin-top: 16px; max-width: 900px; }
   code { background: #0f1319; padding: 1px 5px; border-radius: 4px; font-size: 11px; }
   .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; z-index: 50; }
@@ -117,6 +120,7 @@
   <button id="export">Export progress</button>
   <button id="import">Import progress</button>
   <button id="historyBtn">Collection history</button>
+  <button id="huntBtn">🎯 Random missing</button>
   <button id="copyMissing">Copy missing</button>
   <button id="copyGot">Copy obtained</button>
   <input type="file" id="importFile" accept="application/json" style="display:none">
@@ -305,6 +309,23 @@ async function loadCatalogue(){
 loadCatalogue().catch(err => {
   document.getElementById("totalProg").textContent = "Could not load items.json: " + err.message;
   console.error(err);
+});
+document.getElementById("huntBtn").addEventListener("click", () => {
+  const missing = ALL.filter(([id]) => !state.got[id]);
+  if (!missing.length) {
+    alert("You have collected every item in the catalogue. Absolute menace. 🏆");
+    return;
+  }
+  const [id] = missing[Math.floor(Math.random() * missing.length)];
+  document.getElementById("hideGot").checked = false;
+  document.getElementById("search").value = "";
+  update();
+  const cell = document.querySelector('.cell[data-id="' + CSS.escape(id) + '"]');
+  if (!cell) return;
+  document.querySelectorAll(".cell.hunt-target").forEach(c => c.classList.remove("hunt-target"));
+  cell.classList.add("hunt-target");
+  cell.scrollIntoView({behavior: "smooth", block: "center"});
+  window.setTimeout(() => cell.classList.remove("hunt-target"), 2600);
 });
 document.getElementById("search").addEventListener("input", update);
 document.getElementById("hideGot").addEventListener("change", update);
