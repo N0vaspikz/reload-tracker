@@ -1,0 +1,539 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "m01",
+      "name": "Enhanced Collateral Damage AR",
+      "category": "mythic",
+      "image": "cell-m01.png"
+    },
+    {
+      "id": "m02",
+      "name": "Enhanced Holo Twister AR",
+      "category": "mythic",
+      "image": "cell-m02.png"
+    },
+    {
+      "id": "m03",
+      "name": "Enhanced Spire Rifle",
+      "category": "mythic",
+      "image": "cell-m03.png"
+    },
+    {
+      "id": "m04",
+      "name": "Overclocked Pulse Rifle",
+      "category": "mythic",
+      "image": "cell-m04.png"
+    },
+    {
+      "id": "m05",
+      "name": "Cerberus' Gatekeeper Shotgun",
+      "category": "mythic",
+      "image": "cell-m05.png"
+    },
+    {
+      "id": "m06",
+      "name": "Midas' Gilded Eye Drum Gun",
+      "category": "mythic",
+      "image": "cell-m06.png"
+    },
+    {
+      "id": "m07",
+      "name": "Baron's Double Down Pistol",
+      "category": "mythic",
+      "image": "cell-m07.png"
+    },
+    {
+      "id": "m08",
+      "name": "The Foundation's MK-Seven Assault Rifle",
+      "category": "mythic",
+      "image": "cell-m08.png"
+    },
+    {
+      "id": "m09",
+      "name": "Sideways Rifle",
+      "category": "mythic",
+      "image": "cell-m09.png"
+    },
+    {
+      "id": "m10",
+      "name": "Kit's Shockwave Launcher",
+      "category": "mythic",
+      "image": "cell-m10.png"
+    },
+    {
+      "id": "m11",
+      "name": "The Ageless Champion's Shockwave Hammer",
+      "category": "mythic",
+      "image": "cell-m11.png"
+    },
+    {
+      "id": "m12",
+      "name": "Mythic Goldfish",
+      "category": "mythic",
+      "image": "cell-m12.png"
+    },
+    {
+      "id": "m13",
+      "name": "Enhanced Enforcer AR",
+      "category": "mythic",
+      "image": "cell-m13.png"
+    },
+    {
+      "id": "m14",
+      "name": "Emma Frost's Striker Burst AR",
+      "category": "mythic",
+      "image": "cell-m14.png"
+    },
+    {
+      "id": "m15",
+      "name": "Sideways Minigun",
+      "category": "mythic",
+      "image": "cell-m15.png"
+    },
+    {
+      "id": "m16",
+      "name": "O.X.R Rifle",
+      "category": "mythic",
+      "image": "cell-m16.png"
+    },
+    {
+      "id": "m17",
+      "name": "Enhanced Sentinel Pump Shotgun",
+      "category": "mythic",
+      "image": "cell-m17.png"
+    },
+    {
+      "id": "m18",
+      "name": "Enhanced Wrecker Revolver",
+      "category": "mythic",
+      "image": "cell-m18.png"
+    },
+    {
+      "id": "m19",
+      "name": "Oscar's Frenzy Auto Shotgun",
+      "category": "mythic",
+      "image": "cell-m19.png"
+    },
+    {
+      "id": "m20",
+      "name": "Enhanced Oni Shotgun",
+      "category": "mythic",
+      "image": "cell-m20.png"
+    },
+    {
+      "id": "m21",
+      "name": "Valeria's Hyper SMG",
+      "category": "mythic",
+      "image": "cell-m21.png"
+    },
+    {
+      "id": "m22",
+      "name": "Enhanced Fury Assault Rifle",
+      "category": "mythic",
+      "image": "cell-m22.png"
+    },
+    {
+      "id": "m23",
+      "name": "Midas' Modular Drum Gun",
+      "category": "mythic",
+      "image": "cell-m23.png"
+    },
+    {
+      "id": "m24",
+      "name": "Ringmaster's Boom Bolt",
+      "category": "mythic",
+      "image": "cell-m24.png"
+    },
+    {
+      "id": "m25",
+      "name": "Vector 7 DMR",
+      "category": "mythic",
+      "image": "cell-m25.png"
+    },
+    {
+      "id": "m26",
+      "name": "Night Rose Veiled Precision SMG",
+      "category": "mythic",
+      "image": "cell-m26.png"
+    },
+    {
+      "id": "m27",
+      "name": "Ares' Warforged Assault Rifle",
+      "category": "mythic",
+      "image": "cell-m27.png"
+    },
+    {
+      "id": "m28",
+      "name": "Sideways Scythe",
+      "category": "mythic",
+      "image": "cell-m28.png"
+    },
+    {
+      "id": "m29",
+      "name": "Hades' Harbringer SMG",
+      "category": "mythic",
+      "image": "cell-m29.png"
+    },
+    {
+      "id": "m30",
+      "name": "Conductor's Hand Cannon",
+      "category": "mythic",
+      "image": "cell-m30.png"
+    },
+    {
+      "id": "m31",
+      "name": "The Foundation's Power Gloves",
+      "category": "mythic",
+      "image": "cell-m31.png"
+    },
+    {
+      "id": "m32",
+      "name": "Brute Nemesis AR",
+      "category": "mythic",
+      "image": "cell-m32.png"
+    },
+    {
+      "id": "m33",
+      "name": "Enhanced Havoc Pump Shotgun",
+      "category": "mythic",
+      "image": "cell-m33.png"
+    },
+    {
+      "id": "m34",
+      "name": "Pinpoint Iron Pump Shotgun",
+      "category": "mythic",
+      "image": "cell-m34.png"
+    },
+    {
+      "id": "m35",
+      "name": "Jules' Glider Gun",
+      "category": "mythic",
+      "image": "cell-m35.png"
+    },
+    {
+      "id": "m36",
+      "name": "Bigfoot's Flex SMG",
+      "category": "mythic",
+      "image": "cell-m36.png"
+    },
+    {
+      "id": "m37",
+      "name": "Overdrive Tactical Pistol",
+      "category": "mythic",
+      "image": "cell-m37.png"
+    },
+    {
+      "id": "m38",
+      "name": "Enhanced Surgefire SMG",
+      "category": "mythic",
+      "image": "cell-m38.png"
+    },
+    {
+      "id": "m39",
+      "name": "Skye's Assault Rifle",
+      "category": "mythic",
+      "image": "cell-m39.png"
+    },
+    {
+      "id": "m40",
+      "name": "Meowscle's Peow Peow Rifle",
+      "category": "mythic",
+      "image": "cell-m40.png"
+    },
+    {
+      "id": "m41",
+      "name": "Brutus' Minigun",
+      "category": "mythic",
+      "image": "cell-m41.png"
+    },
+    {
+      "id": "m42",
+      "name": "Midas' Drum Gun (OG)",
+      "category": "mythic",
+      "image": "cell-m42.png"
+    },
+    {
+      "id": "m43",
+      "name": "Skye's Grappler",
+      "category": "mythic",
+      "image": "cell-m43.png"
+    },
+    {
+      "id": "m44",
+      "name": "Enhanced Twinfire Auto Shotgun",
+      "category": "mythic",
+      "image": "cell-m44.png"
+    },
+    {
+      "id": "m45",
+      "name": "Two-Shot Shotgun",
+      "category": "mythic",
+      "image": "cell-m45.png"
+    },
+    {
+      "id": "m46",
+      "name": "The Ageless Champion's Ex-Caliber Rifle",
+      "category": "mythic",
+      "image": "cell-m46.png"
+    },
+    {
+      "id": "m47",
+      "name": "Megalo Don's Modular Combat Shotgun",
+      "category": "mythic",
+      "image": "cell-m47.png"
+    },
+    {
+      "id": "m48",
+      "name": "Precision Airstrike",
+      "category": "mythic",
+      "image": "cell-m48.png"
+    },
+    {
+      "id": "e01",
+      "name": "Heisted Explosive Assault Rifle",
+      "category": "exotic",
+      "image": "cell-e01.png"
+    },
+    {
+      "id": "e02",
+      "name": "Heisted Accelerant Shotgun",
+      "category": "exotic",
+      "image": "cell-e02.png"
+    },
+    {
+      "id": "e03",
+      "name": "Boom Sniper Rifle",
+      "category": "exotic",
+      "image": "cell-e03.png"
+    },
+    {
+      "id": "e04",
+      "name": "Lawless Accelerant Holo Twister AR",
+      "category": "exotic",
+      "image": "cell-e04.png"
+    },
+    {
+      "id": "e05",
+      "name": "Lawless Trinity Assault Rifle",
+      "category": "exotic",
+      "image": "cell-e05.png"
+    },
+    {
+      "id": "e06",
+      "name": "Lawless Twinfire Slap Shotgun",
+      "category": "exotic",
+      "image": "cell-e06.png"
+    },
+    {
+      "id": "e07",
+      "name": "Lawless Heavy Impact Tracking Sniper",
+      "category": "exotic",
+      "image": "cell-e07.png"
+    },
+    {
+      "id": "e08",
+      "name": "Lawless Stink Rifle",
+      "category": "exotic",
+      "image": "cell-e08.png"
+    },
+    {
+      "id": "e09",
+      "name": "Lawless Explosive Mammoth Pistol",
+      "category": "exotic",
+      "image": "cell-e09.png"
+    },
+    {
+      "id": "e10",
+      "name": "Lawless Shockwave Rocket Launcher",
+      "category": "exotic",
+      "image": "cell-e10.png"
+    },
+    {
+      "id": "e11",
+      "name": "Lawless Slap Cannon",
+      "category": "exotic",
+      "image": "cell-e11.png"
+    },
+    {
+      "id": "e12",
+      "name": "Lawless Slap Jug",
+      "category": "exotic",
+      "image": "cell-e12.png"
+    },
+    {
+      "id": "e13",
+      "name": "Slapberry Fizz",
+      "category": "exotic",
+      "image": "cell-e13.png"
+    },
+    {
+      "id": "e14",
+      "name": "The Foundation's Rift Rifle",
+      "category": "exotic",
+      "image": "cell-e14.png"
+    },
+    {
+      "id": "e15",
+      "name": "Spicy Slapperoni Slice",
+      "category": "exotic",
+      "image": "cell-e15.png"
+    },
+    {
+      "id": "e16",
+      "name": "Unstable Frostfire Shotgun",
+      "category": "exotic",
+      "image": "cell-e16.png"
+    },
+    {
+      "id": "e17",
+      "name": "Unstable Yoink Shotgun",
+      "category": "exotic",
+      "image": "cell-e17.png"
+    },
+    {
+      "id": "e18",
+      "name": "Unstable Voltage Burst Pistol",
+      "category": "exotic",
+      "image": "cell-e18.png"
+    },
+    {
+      "id": "e19",
+      "name": "Unstable Thunderclap DMR",
+      "category": "exotic",
+      "image": "cell-e19.png"
+    },
+    {
+      "id": "e20",
+      "name": "Eradicator Hop Rock Fury Assault Rifle",
+      "category": "exotic",
+      "image": "cell-e20.png"
+    },
+    {
+      "id": "e21",
+      "name": "Eradicator O.X.R. Rifle",
+      "category": "exotic",
+      "image": "cell-e21.png"
+    },
+    {
+      "id": "e22",
+      "name": "Double Trouble (L)",
+      "category": "exotic",
+      "image": "cell-e22.png"
+    },
+    {
+      "id": "e23",
+      "name": "Double Trouble (R)",
+      "category": "exotic",
+      "image": "cell-e23.png"
+    },
+    {
+      "id": "e24",
+      "name": "Eradicator Wrecker Revolver",
+      "category": "exotic",
+      "image": "cell-e24.png"
+    },
+    {
+      "id": "e25",
+      "name": "Eradicator Shadow Precision SMG",
+      "category": "exotic",
+      "image": "cell-e25.png"
+    },
+    {
+      "id": "e26",
+      "name": "Eradicator Shock N' Slow Shockwave Launcher",
+      "category": "exotic",
+      "image": "cell-e26.png"
+    },
+    {
+      "id": "e27",
+      "name": "Kado Thorne's Deadeye Assault Rifle",
+      "category": "exotic",
+      "image": "cell-e27.png"
+    },
+    {
+      "id": "e28",
+      "name": "Kado Thorne's Gatekeeper Shotgun",
+      "category": "exotic",
+      "image": "cell-e28.png"
+    },
+    {
+      "id": "e29",
+      "name": "Kado Thorne's Monarch Pistol",
+      "category": "exotic",
+      "image": "cell-e29.png"
+    },
+    {
+      "id": "e30",
+      "name": "Kado Thorne's Twin Siphon Shotgun",
+      "category": "exotic",
+      "image": "cell-e30.png"
+    },
+    {
+      "id": "e31",
+      "name": "Venomous Dual Fiend Hunters",
+      "category": "exotic",
+      "image": "cell-e31.png"
+    },
+    {
+      "id": "d01",
+      "name": "Explosive Dev Chest",
+      "category": "dev",
+      "image": "cell-m24.png"
+    },
+    {
+      "id": "d02",
+      "name": "Chapter 2 Dev Chest",
+      "category": "dev",
+      "image": "cell-m42.png"
+    },
+    {
+      "id": "d03",
+      "name": "Pizza Dev Chest",
+      "category": "dev",
+      "image": "cell-e15.png"
+    },
+    {
+      "id": "d04",
+      "name": "Deagle Dev Chest",
+      "category": "dev",
+      "image": "cell-m30.png"
+    },
+    {
+      "id": "d05",
+      "name": "MK Dev Chest",
+      "category": "dev",
+      "image": "cell-m08.png"
+    },
+    {
+      "id": "d06",
+      "name": "Chapter 5 Dev Chest",
+      "category": "dev",
+      "image": "cell-m19.png"
+    },
+    {
+      "id": "d07",
+      "name": "Unstable Dev Chest",
+      "category": "dev",
+      "image": "cell-e18.png"
+    },
+    {
+      "id": "d08",
+      "name": "Lawless Dev Chest",
+      "category": "dev",
+      "image": "cell-e04.png"
+    },
+    {
+      "id": "d09",
+      "name": "Boom Dev Chest",
+      "category": "dev",
+      "image": "cell-e10.png"
+    },
+    {
+      "id": "d10",
+      "name": "Eradicator Dev Chest",
+      "category": "dev",
+      "image": "cell-e24.png"
+    }
+  ]
+}
