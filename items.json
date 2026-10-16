@@ -81,7 +81,7 @@
     },
     {
       "id": "m14",
-      "name": "Emma Frost's Striker Burst AR",
+      "name": "Enhanced Striker Burst AR",
       "category": "mythic",
       "image": "cell-m14.png"
     },
@@ -288,6 +288,12 @@
       "name": "Precision Airstrike",
       "category": "mythic",
       "image": "cell-m48.png"
+    },
+    {
+      "id": "m49",
+      "name": "Thorne's Vampiric Blade",
+      "category": "mythic",
+      "image": "cell-m49.png"
     },
     {
       "id": "m50",
